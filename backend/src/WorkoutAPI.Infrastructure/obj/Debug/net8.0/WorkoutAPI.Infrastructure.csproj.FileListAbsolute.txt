@@ -1,0 +1,17 @@
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\bin\Debug\net8.0\WorkoutAPI.Infrastructure.deps.json
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\bin\Debug\net8.0\WorkoutAPI.Infrastructure.runtimeconfig.json
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\bin\Debug\net8.0\WorkoutAPI.Infrastructure.dll
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\bin\Debug\net8.0\WorkoutAPI.Infrastructure.pdb
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\bin\Debug\net8.0\WorkoutAPI.Domain.dll
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\bin\Debug\net8.0\WorkoutAPI.Domain.pdb
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.csproj.AssemblyReference.cache
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.AssemblyInfoInputs.cache
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.AssemblyInfo.cs
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.csproj.CoreCompileInputs.cache
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutA.0CF3146E.Up2Date
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.dll
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\refint\WorkoutAPI.Infrastructure.dll
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.pdb
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.genruntimeconfig.cache
+C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\ref\WorkoutAPI.Infrastructure.dll

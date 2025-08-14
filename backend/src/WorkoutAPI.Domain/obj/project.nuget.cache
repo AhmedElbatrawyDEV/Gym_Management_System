@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "WY3nZCEmtps=",
+  "success": true,
+  "projectFilePath": "C:\\workoutrepo\\Gym_Management_System\\backend\\src\\WorkoutAPI.Domain\\WorkoutAPI.Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\asayed.c\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\asayed.c\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
