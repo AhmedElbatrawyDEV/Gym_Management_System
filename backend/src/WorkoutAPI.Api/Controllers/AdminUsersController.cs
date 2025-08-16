@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WorkoutAPI.Application.Abstractions;
 using WorkoutAPI.Application.Services;
 
 [Authorize(Roles = "Admin")]

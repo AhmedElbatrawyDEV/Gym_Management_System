@@ -1,6 +1,6 @@
 using WorkoutAPI.Domain.Entities;
 
-namespace WorkoutAPI.Domain.Interfaces;
+namespace WorkoutAPI.Infrastructure.Interfaces;
 
 public interface IWorkoutSessionRepository : IRepository<WorkoutSession>
 {

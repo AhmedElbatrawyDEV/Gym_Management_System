@@ -15,3 +15,9 @@ C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\
 C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.pdb
 C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.genruntimeconfig.cache
 C:\workoutrepo\Complete_Gym_Management_System_FIXED\complete_gym_system\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\ref\WorkoutAPI.Infrastructure.dll
+C:\Users\Beboa\Source\Repos\Gym_Management_System\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Beboa\Source\Repos\Gym_Management_System\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Beboa\Source\Repos\Gym_Management_System\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Beboa\Source\Repos\Gym_Management_System\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.AssemblyInfo.cs
+C:\Users\Beboa\Source\Repos\Gym_Management_System\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Beboa\Source\Repos\Gym_Management_System\backend\src\WorkoutAPI.Infrastructure\obj\Debug\net8.0\WorkoutAPI.Infrastructure.sourcelink.json

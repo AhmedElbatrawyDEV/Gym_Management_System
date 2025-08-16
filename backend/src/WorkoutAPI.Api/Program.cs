@@ -1,66 +1,91 @@
-using FluentValidation;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using WorkoutAPI.Application;
-using WorkoutAPI.Infrastructure;
+using WorkoutAPI.Application.Abstractions;
+using WorkoutAPI.Application.Services;
 using WorkoutAPI.Infrastructure.Data;
+using WorkoutAPI.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers();
+builder.Services.AddDbContext<AppDbContext>(opt => 
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
 
-// Add CORS
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", policy => {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+// MVC + NewtonsoftJson
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-// Add Swagger/OpenAPI
+builder.Services.AddApplication(); // AutoMapper + Validators
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => {
-    c.SwaggerDoc("v1", new() {
-        Title = "Workout API",
-        Version = "v1",
-        Description = "A comprehensive workout tracking API with multi-language support"
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gym Management API", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] { } }
     });
 });
 
-// Add Application and Infrastructure layers
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+// JWT
+var key = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key missing.");
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+        };
+    });
+builder.Services.AddAuthorization();
 
-// Add FluentValidation
-builder.Services.AddValidatorsFromAssemblyContaining<WorkoutAPI.Application.Validators.CreateUserRequestValidator>();
+// DI
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
+builder.Services.AddScoped<IPaymentProcessor, PaymentService>();
+
+// Repositories (if you need them via interfaces)
+builder.Services.AddScoped<WorkoutAPI.Domain.Interfaces.IUserRepository, UserRepository>();
+builder.Services.AddScoped<WorkoutAPI.Domain.Interfaces.IExerciseRepository, ExerciseRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c => {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Workout API v1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at app's root
-    });
+    app.UseSwaggerUI();
 }
-
-// Enable CORS
-app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-// Ensure database is created
+// apply migrations on startup (dev)
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<WorkoutDbContext>();
-    context.Database.EnsureCreated(); // Commented out to avoid Entity Framework issues
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
 }
 
-app.Run("http://0.0.0.0:5000");
-
+app.Run();

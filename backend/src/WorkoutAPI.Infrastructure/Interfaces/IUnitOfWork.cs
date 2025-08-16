@@ -1,4 +1,4 @@
-namespace WorkoutAPI.Domain.Interfaces;
+namespace WorkoutAPI.Infrastructure.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
