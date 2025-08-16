@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Interfaces;
 using WorkoutAPI.Infrastructure.Data;
-using WorkoutAPI.Infrastructure.Interfaces;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class WorkoutSessionRepository : EfRepository<WorkoutSession>, IWorkoutSessionRepository
+public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSessionRepository
 {
-    public WorkoutSessionRepository(AppDbContext context) : base(context)
+    public WorkoutSessionRepository(WorkoutDbContext context) : base(context)
     {
     }
 

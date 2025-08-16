@@ -1,34 +1,127 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WorkoutAPI.Application.Abstractions;
 using WorkoutAPI.Application.DTOs;
+using WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Interfaces;
+using Mapster;
 
 namespace WorkoutAPI.Api.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ExercisesController : ControllerBase
 {
-    private readonly IExerciseService _service;
-    public ExercisesController(IExerciseService service){ _service = service; }
+    private readonly IExerciseRepository _exerciseRepository;
+    private readonly ILogger<ExercisesController> _logger;
 
-    [HttpGet] public Task<List<ExerciseResponse>> List() => _service.ListAsync();
-
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ExerciseResponse>> Get(Guid id)
+    public ExercisesController(IExerciseRepository exerciseRepository, ILogger<ExercisesController> logger)
     {
-        var e = await _service.GetAsync(id);
-        return e is null ? NotFound() : Ok(e);
+        _exerciseRepository = exerciseRepository;
+        _logger = logger;
     }
 
-    [Authorize(Roles = "Admin,Trainer")]
-    [HttpPost]
-    public Task<ExerciseResponse> Create(CreateExerciseRequest req) => _service.CreateAsync(req);
+    /// <summary>
+    /// Get all exercises with translations
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<ExerciseResponse>>> GetExercises([FromQuery] Language language = Language.Arabic)
+    {
+        try
+        {
+            var exercises = await _exerciseRepository.GetExercisesWithTranslationsAsync(language);
+            var response = exercises.Adapt<IEnumerable<ExerciseResponse>>();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting exercises");
+            return StatusCode(500, "An error occurred while processing your request");
+        }
+    }
 
-    [Authorize(Roles = "Admin,Trainer")]
-    [HttpPut("{id:guid}")]
-    public Task<ExerciseResponse> Update(Guid id, CreateExerciseRequest req) => _service.UpdateAsync(id, req);
+    /// <summary>
+    /// Get exercise by ID
+    /// </summary>
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<ExerciseResponse>> GetExercise(Guid id, [FromQuery] Language language = Language.Arabic)
+    {
+        try
+        {
+            var exercise = await _exerciseRepository.GetWithTranslationsAsync(id);
+            if (exercise == null)
+            {
+                return NotFound($"Exercise with ID {id} not found");
+            }
 
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id){ await _service.DeleteAsync(id); return NoContent(); }
+            var response = exercise.Adapt<ExerciseResponse>();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting exercise {ExerciseId}", id);
+            return StatusCode(500, "An error occurred while processing your request");
+        }
+    }
+
+    /// <summary>
+    /// Get exercises by type (Push, Pull, Legs)
+    /// </summary>
+    [HttpGet("by-type/{type}")]
+    public async Task<ActionResult<IEnumerable<ExerciseResponse>>> GetExercisesByType(ExerciseType type, [FromQuery] Language language = Language.Arabic)
+    {
+        try
+        {
+            var exercises = await _exerciseRepository.GetByTypeAsync(type);
+            var response = exercises.Adapt<IEnumerable<ExerciseResponse>>();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting exercises by type {ExerciseType}", type);
+            return StatusCode(500, "An error occurred while processing your request");
+        }
+    }
+
+    /// <summary>
+    /// Get exercises by muscle group
+    /// </summary>
+    [HttpGet("by-muscle-group/{muscleGroup}")]
+    public async Task<ActionResult<IEnumerable<ExerciseResponse>>> GetExercisesByMuscleGroup(MuscleGroup muscleGroup, [FromQuery] Language language = Language.Arabic)
+    {
+        try
+        {
+            var exercises = await _exerciseRepository.GetByMuscleGroupAsync(muscleGroup);
+            var response = exercises.Adapt<IEnumerable<ExerciseResponse>>();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting exercises by muscle group {MuscleGroup}", muscleGroup);
+            return StatusCode(500, "An error occurred while processing your request");
+        }
+    }
+
+    /// <summary>
+    /// Get exercise by code
+    /// </summary>
+    [HttpGet("by-code/{code}")]
+    public async Task<ActionResult<ExerciseResponse>> GetExerciseByCode(string code, [FromQuery] Language language = Language.Arabic)
+    {
+        try
+        {
+            var exercise = await _exerciseRepository.GetByCodeAsync(code);
+            if (exercise == null)
+            {
+                return NotFound($"Exercise with code {code} not found");
+            }
+
+            var response = exercise.Adapt<ExerciseResponse>();
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting exercise by code {Code}", code);
+            return StatusCode(500, "An error occurred while processing your request");
+        }
+    }
 }
+
