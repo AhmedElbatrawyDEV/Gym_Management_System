@@ -1,0 +1,1 @@
+namespace WorkoutAPI.Domain.Enums; public enum Role { Admin = 0, Trainer = 1, Member = 2 }

@@ -1,158 +1,93 @@
-using Mapster;
-using Microsoft.Extensions.Logging;
+using WorkoutAPI.Application.Abstractions;
 using WorkoutAPI.Application.DTOs;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Interfaces;
+using WorkoutAPI.Infrastructure.Interfaces;
 
 namespace WorkoutAPI.Application.Services;
 
-public interface IUserService
-{
-    Task<UserResponse> CreateUserAsync(CreateUserRequest request);
-    Task<UserResponse> UpdateUserAsync(Guid userId, UpdateUserRequest request);
-    Task<UserResponse?> GetUserByIdAsync(Guid userId);
-    Task<UserResponse?> GetUserByEmailAsync(string email);
-    Task<UserProfileResponse?> GetUserProfileAsync(Guid userId);
-    Task<IEnumerable<UserResponse>> GetActiveUsersAsync();
-    Task<bool> DeleteUserAsync(Guid userId);
-    Task<bool> UserExistsAsync(string email);
-}
-
 public class UserService : IUserService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<UserService> _logger;
+    private readonly IRepository<User> _userRepository;
+    private readonly ICurrentUserService _currentUserService;
 
-    public UserService(IUnitOfWork unitOfWork, ILogger<UserService> logger)
+    public UserService(
+        IRepository<User> userRepository,
+        ICurrentUserService currentUserService)
     {
-        _unitOfWork = unitOfWork;
-        _logger = logger;
+        _userRepository = userRepository;
+        _currentUserService = currentUserService;
     }
 
-    public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
+    public async Task<UserDto> GetUserAsync(Guid id)
     {
-        _logger.LogInformation("Creating new user with email: {Email}", request.Email);
-
-        // Check if user already exists
-        var existingUser = await _unitOfWork.Users.GetByEmailAsync(request.Email);
-        if (existingUser != null)
-        {
-            throw new InvalidOperationException($"User with email {request.Email} already exists");
-        }
-
-        // Check phone number if provided
-        if (!string.IsNullOrEmpty(request.PhoneNumber))
-        {
-            var existingUserByPhone = await _unitOfWork.Users.GetByPhoneAsync(request.PhoneNumber);
-            if (existingUserByPhone != null)
-            {
-                throw new InvalidOperationException($"User with phone number {request.PhoneNumber} already exists");
-            }
-        }
-
-        var user = request.Adapt<User>();
-        await _unitOfWork.Users.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("User created successfully with ID: {UserId}", user.Id);
-
-        return user.Adapt<UserResponse>();
+        var user = await _userRepository.GetByIdAsync(id);
+        return MapToDto(user);
     }
 
-    public async Task<UserResponse> UpdateUserAsync(Guid userId, UpdateUserRequest request)
+    public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
     {
-        _logger.LogInformation("Updating user with ID: {UserId}", userId);
+        var users = await _userRepository.ListAsync();
+        return users.Select(MapToDto);
+    }
 
-        var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        if (user == null)
+    public async Task<UserDto> CreateUserAsync(UserCreateRequest request)
+    {
+        var user = new User
         {
-            throw new ArgumentException($"User with ID {userId} not found");
-        }
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            PhoneNumber = request.PhoneNumber,
+            DateOfBirth = request.DateOfBirth,
+            Gender = request.Gender,
+            ProfileImageUrl = request.ProfileImageUrl
+        };
 
-        // Check phone number if changed
-        if (!string.IsNullOrEmpty(request.PhoneNumber) && request.PhoneNumber != user.PhoneNumber)
-        {
-            var existingUserByPhone = await _unitOfWork.Users.GetByPhoneAsync(request.PhoneNumber);
-            if (existingUserByPhone != null && existingUserByPhone.Id != userId)
-            {
-                throw new InvalidOperationException($"User with phone number {request.PhoneNumber} already exists");
-            }
-        }
+        await _userRepository.AddAsync(user, _currentUserService.UserId);
+        return MapToDto(user);
+    }
 
-        // Update user properties
+    public async Task<UserDto> UpdateUserAsync(Guid id, UserUpdateRequest request)
+    {
+        var user = await _userRepository.GetByIdAsync(id);
+        if (user == null) throw new KeyNotFoundException("User not found");
+
         user.FirstName = request.FirstName;
         user.LastName = request.LastName;
         user.PhoneNumber = request.PhoneNumber;
         user.DateOfBirth = request.DateOfBirth;
         user.Gender = request.Gender;
         user.ProfileImageUrl = request.ProfileImageUrl;
-        user.SetUpdated();
 
-        _unitOfWork.Users.Update(user);
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("User updated successfully with ID: {UserId}", userId);
-
-        return user.Adapt<UserResponse>();
+        await _userRepository.UpdateAsync(user, _currentUserService.UserId);
+        return MapToDto(user);
     }
 
-    public async Task<UserResponse?> GetUserByIdAsync(Guid userId)
+    public async Task DeleteUserAsync(Guid id)
     {
-        var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        return user?.Adapt<UserResponse>();
+        await _userRepository.DeleteAsync(id, _currentUserService.UserId);
     }
 
-    public async Task<UserResponse?> GetUserByEmailAsync(string email)
+    public async Task RestoreUserAsync(Guid id)
     {
-        var user = await _unitOfWork.Users.GetByEmailAsync(email);
-        return user?.Adapt<UserResponse>();
+        await _userRepository.RestoreAsync(id, _currentUserService.UserId);
     }
 
-    public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
+    private UserDto MapToDto(User user)
     {
-        var user = await _unitOfWork.Users.GetUserWithWorkoutPlansAsync(userId);
-        if (user == null) return null;
-
-        var userWithSessions = await _unitOfWork.Users.GetUserWithSessionsAsync(userId);
-        if (userWithSessions != null)
+        return new UserDto
         {
-            user.WorkoutSessions = userWithSessions.WorkoutSessions;
-        }
-
-        return user.Adapt<UserProfileResponse>();
-    }
-
-    public async Task<IEnumerable<UserResponse>> GetActiveUsersAsync()
-    {
-        var users = await _unitOfWork.Users.GetActiveUsersAsync();
-        return users.Adapt<IEnumerable<UserResponse>>();
-    }
-
-    public async Task<bool> DeleteUserAsync(Guid userId)
-    {
-        _logger.LogInformation("Deleting user with ID: {UserId}", userId);
-
-        var user = await _unitOfWork.Users.GetByIdAsync(userId);
-        if (user == null)
-        {
-            return false;
-        }
-
-        // Soft delete by setting IsActive to false
-        user.IsActive = false;
-        user.SetUpdated();
-
-        _unitOfWork.Users.Update(user);
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("User soft deleted successfully with ID: {UserId}", userId);
-
-        return true;
-    }
-
-    public async Task<bool> UserExistsAsync(string email)
-    {
-        return await _unitOfWork.Users.ExistsAsync(u => u.Email == email && u.IsActive);
+            Id = user.Id,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            DateOfBirth = user.DateOfBirth,
+            Gender = user.Gender.ToString(),
+            ProfileImageUrl = user.ProfileImageUrl,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt
+        };
     }
 }
-
