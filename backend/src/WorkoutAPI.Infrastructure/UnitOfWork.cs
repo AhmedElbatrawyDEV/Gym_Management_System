@@ -11,6 +11,11 @@ public class UnitOfWork : IUnitOfWork
     private IDbContextTransaction? _transaction;
     
     private IUserRepository? _users;
+    private IUserCredentialsRepository? _userCredentials;
+    private ITrainerRepository? _trainers;
+    private IMemberRepository? _members;
+    private IPaymentRepository? _payments;
+    private IScheduleRepository? _schedules;
     private IExerciseRepository? _exercises;
     private IWorkoutSessionRepository? _workoutSessions;
 
@@ -20,6 +25,11 @@ public class UnitOfWork : IUnitOfWork
     }
 
     public IUserRepository Users => _users ??= new UserRepository(_context);
+    public IUserCredentialsRepository UserCredentials => _userCredentials ??= new UserCredentialsRepository(_context);
+    public ITrainerRepository Trainers => _trainers ??= new TrainerRepository(_context);
+    public IMemberRepository Members => _members ??= new MemberRepository(_context);
+    public IPaymentRepository Payments => _payments ??= new PaymentRepository(_context);
+    public IScheduleRepository Schedules => _schedules ??= new ScheduleRepository(_context);
     public IExerciseRepository Exercises => _exercises ??= new ExerciseRepository(_context);
     public IWorkoutSessionRepository WorkoutSessions => _workoutSessions ??= new WorkoutSessionRepository(_context);
 

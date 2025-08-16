@@ -3,6 +3,11 @@ namespace WorkoutAPI.Domain.Interfaces;
 public interface IUnitOfWork : IDisposable
 {
     IUserRepository Users { get; }
+    IUserCredentialsRepository UserCredentials { get; }
+    ITrainerRepository Trainers { get; }
+    IMemberRepository Members { get; }
+    IPaymentRepository Payments { get; }
+    IScheduleRepository Schedules { get; }
     IExerciseRepository Exercises { get; }
     IWorkoutSessionRepository WorkoutSessions { get; }
     

@@ -9,6 +9,11 @@ public class WorkoutDbContext : DbContext {
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<UserCredentials> UserCredentials { get; set; }
+    public DbSet<Trainer> Trainers { get; set; }
+    public DbSet<Member> Members { get; set; }
+    public DbSet<Payment> Payments { get; set; }
+    public DbSet<Schedule> Schedules { get; set; }
     public DbSet<Exercise> Exercises { get; set; }
     public DbSet<ExerciseTranslation> ExerciseTranslations { get; set; }
     public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
@@ -35,6 +40,18 @@ public class WorkoutDbContext : DbContext {
     private static void ConfigureEnums(ModelBuilder modelBuilder) {
         modelBuilder.Entity<User>()
             .Property(e => e.Gender)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<UserCredentials>()
+            .Property(e => e.Role)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Member>()
+            .Property(e => e.MembershipType)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<Payment>()
+            .Property(e => e.Status)
             .HasConversion<string>();
 
         modelBuilder.Entity<Exercise>()
@@ -80,6 +97,53 @@ public class WorkoutDbContext : DbContext {
         modelBuilder.Entity<User>()
             .HasIndex(u => u.PhoneNumber)
             .IsUnique();
+
+        // UserCredentials indexes
+        modelBuilder.Entity<UserCredentials>()
+            .HasIndex(uc => uc.UserId)
+            .IsUnique();
+
+        modelBuilder.Entity<UserCredentials>()
+            .HasIndex(uc => uc.Role);
+
+        // Trainer indexes
+        modelBuilder.Entity<Trainer>()
+            .HasIndex(t => t.UserId)
+            .IsUnique();
+
+        modelBuilder.Entity<Trainer>()
+            .HasIndex(t => t.Specialization);
+
+        // Member indexes
+        modelBuilder.Entity<Member>()
+            .HasIndex(m => m.UserId)
+            .IsUnique();
+
+        modelBuilder.Entity<Member>()
+            .HasIndex(m => m.MembershipType);
+
+        modelBuilder.Entity<Member>()
+            .HasIndex(m => m.MembershipEndDate);
+
+        // Payment indexes
+        modelBuilder.Entity<Payment>()
+            .HasIndex(p => p.MemberId);
+
+        modelBuilder.Entity<Payment>()
+            .HasIndex(p => p.PaymentDate);
+
+        modelBuilder.Entity<Payment>()
+            .HasIndex(p => p.Status);
+
+        // Schedule indexes
+        modelBuilder.Entity<Schedule>()
+            .HasIndex(s => s.TrainerId);
+
+        modelBuilder.Entity<Schedule>()
+            .HasIndex(s => s.StartTime);
+
+        modelBuilder.Entity<Schedule>()
+            .HasIndex(s => s.WorkoutPlanId);
 
         // Exercise indexes
         modelBuilder.Entity<Exercise>()
