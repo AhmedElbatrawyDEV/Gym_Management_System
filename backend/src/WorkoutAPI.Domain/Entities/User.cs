@@ -16,3 +16,4 @@ public class User : BaseEntity
     public MemberProfile? MemberProfile { get; set; }
     public TrainerProfile? TrainerProfile { get; set; }
 }
+

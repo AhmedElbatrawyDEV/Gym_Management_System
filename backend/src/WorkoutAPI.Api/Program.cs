@@ -2,90 +2,68 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using WorkoutAPI.Application;
-using WorkoutAPI.Application.Abstractions;
-using WorkoutAPI.Application.Services;
-using WorkoutAPI.Infrastructure.Data;
-using WorkoutAPI.Infrastructure.Repositories;
+using WorkoutAPI.Infrastructure;
+using WorkoutAPI.Infrastructure.Persistence;
+using WorkoutAPI.Infrastructure.Persistence.Seed;
+using WorkoutAPI.Infrastructure.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
-builder.Services.AddDbContext<AppDbContext>(opt => 
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-);
-
-// MVC + NewtonsoftJson
-builder.Services.AddControllers()
-    .AddNewtonsoftJson(options =>
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
-builder.Services.AddApplication(); // AutoMapper + Validators
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gym Management API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        { new OpenApiSecurityScheme { Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" } }, new string[] { } }
-    });
-});
+// Db
+builder.Services.AddDbContext<GymDbContext>(opt =>
+    opt.UseSqlServer(config.GetConnectionString("DefaultConnection")));
 
 // JWT
-var key = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key missing.");
-builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+var jwt = config.GetSection("Jwt").Get<JwtOptions>()!;
+builder.Services.AddSingleton(jwt);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
+        o.TokenValidationParameters = new()
         {
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+            ValidIssuer = jwt.Issuer,
+            ValidAudience = jwt.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.SecretKey))
         };
     });
-builder.Services.AddAuthorization();
 
-// DI
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IExerciseService, ExerciseService>();
-builder.Services.AddScoped<IPaymentProcessor, PaymentService>();
+builder.Services.AddAuthorization(opt =>
+{
+    opt.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+    opt.AddPolicy("TrainerOrAdmin", p => p.RequireRole("Trainer", "Admin"));
+    opt.AddPolicy("MemberOrAdmin", p => p.RequireRole("Member", "Admin"));
+});
 
-// Repositories (if you need them via interfaces)
-builder.Services.AddScoped<WorkoutAPI.Domain.Interfaces.IUserRepository, UserRepository>();
-builder.Services.AddScoped<WorkoutAPI.Domain.Interfaces.IExerciseRepository, ExerciseRepository>();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
+    p.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
+
+builder.Services.AddApplicationServices();
+builder.Services.AddInfrastructureServices();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// apply migrations on startup (dev)
+// seed
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    var db = scope.ServiceProvider.GetRequiredService<GymDbContext>();
+    await DbSeeder.SeedAsync(db);
 }
 
 app.Run();
