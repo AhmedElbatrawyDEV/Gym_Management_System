@@ -3,7 +3,7 @@ using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class WorkoutExerciseSession : BaseEntity
+public class WorkoutSessionExercise : BaseEntity
 {
     public Guid WorkoutSessionId { get; set; }
     public Guid ExerciseId { get; set; }

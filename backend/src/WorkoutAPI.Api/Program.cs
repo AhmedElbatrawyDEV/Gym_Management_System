@@ -1,15 +1,87 @@
-using FluentValidation;
+// Program.cs
 using Microsoft.EntityFrameworkCore;
-using WorkoutAPI.Application;
-using WorkoutAPI.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using WorkoutAPI.Infrastructure.Data;
+using WorkoutAPI.Application.Services;
+using WorkoutAPI.Domain.Interfaces;
+using WorkoutAPI.Infrastructure.Repositories;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Mapster;
+using Microsoft.OpenApi.Models;
+using WorkoutAPI.Application.Abstractions;
+using WorkoutAPI.Application.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
+builder.Services.AddDbContext<WorkoutDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+var secretKey = jwtSettings["Key"] ?? "DefaultSecretKeyForJWTTokenGenerationThatShouldBeAtLeast32Characters";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"));
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+});
+
+// Register repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+builder.Services.AddScoped<IWorkoutPlanRepository, WorkoutPlanRepository>();
+builder.Services.AddScoped<IWorkoutSessionRepository, WorkoutSessionRepository>();
+
+// Register application services
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
+builder.Services.AddScoped<IWorkoutPlanService, WorkoutPlanService>();
+builder.Services.AddScoped<IWorkoutSessionService, WorkoutSessionService>();
+
+// Register new services
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+
+// Add FluentValidation
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters()
+    .AddValidatorsFromAssemblyContaining<CreateUserRequestValidator>();
+
+// Add Mapster
+builder.Services.AddMapster();
+
 builder.Services.AddControllers();
 
-// Add CORS
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -20,23 +92,50 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add Swagger/OpenAPI
+// Configure Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new() { 
-        Title = "Workout API", 
-        Version = "v1",
-        Description = "A comprehensive workout tracking API with multi-language support"
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Workout API - Enhanced Gym Management System",
+        Version = "v2.0",
+        Description = "Complete gym management system with user management, subscriptions, payments, and attendance tracking.",
+        Contact = new OpenApiContact
+        {
+            Name = "Ahmed Elbatarwy",
+            Email = "ahmed@gym.com"
+        }
+    });
+
+    // Add JWT Authentication to Swagger
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
     });
 });
-
-// Add Application and Infrastructure layers
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
-
-// Add FluentValidation
-builder.Services.AddValidatorsFromAssemblyContaining<WorkoutAPI.Application.Validators.CreateUserRequestValidator>();
 
 var app = builder.Build();
 
@@ -46,41 +145,39 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Workout API v1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at app's root
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Workout API v2.0");
+        c.RoutePrefix = string.Empty; // Serve Swagger UI at the app's root
     });
 }
 
-// Enable CORS
-app.UseCors("AllowAll");
-
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created and seeded
+// Initialize database (commented out as per your fix notes)
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<WorkoutDbContext>();
-    
     try
     {
-        // Ensure database is created
-        await context.Database.EnsureCreatedAsync();
-        
-        // Seed the database with initial data
-        await SeedData.SeedAsync(context);
-        
-        Console.WriteLine("Database seeded successfully!");
+        // Only create database if it doesn't exist (safer than EnsureCreated)
+        context.Database.EnsureCreated();
+
+        // Alternative: Use migrations in production
+        // context.Database.Migrate();
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
-        // Log the error but don't crash the application
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while creating/updating the database");
     }
 }
 
-app.Run("http://0.0.0.0:5002");
+app.Run();
 
+public partial class Program { } // For integration tests

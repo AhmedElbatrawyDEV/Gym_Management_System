@@ -5,8 +5,8 @@ using WorkoutAPI.Domain.Entities;
 namespace WorkoutAPI.Infrastructure.Data.Configurations;
 
 public class WorkoutExerciseSessionConfiguration
-    : IEntityTypeConfiguration<WorkoutExerciseSession> {
-    public void Configure(EntityTypeBuilder<WorkoutExerciseSession> builder) {
+    : IEntityTypeConfiguration<WorkoutSessionExercise> {
+    public void Configure(EntityTypeBuilder<WorkoutSessionExercise> builder) {
         // Configure owned collection for Sets
         builder.OwnsMany(
             e => e.Sets,
@@ -18,9 +18,9 @@ public class WorkoutExerciseSessionConfiguration
 
                 // Map properties
                 b.Property(s => s.SetNumber);
-                b.Property(s => s.ActualReps);
-                b.Property(s => s.ActualWeight);
-                b.Property(s => s.ActualRestTime);
+                b.Property(s => s.Reps);
+                b.Property(s => s.Weight);
+                b.Property(s => s.RestSeconds);
                 b.Property(s => s.CompletedAt);
                 b.Property(s => s.Notes);
             }

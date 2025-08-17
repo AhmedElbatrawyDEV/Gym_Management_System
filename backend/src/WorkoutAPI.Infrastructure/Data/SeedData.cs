@@ -292,8 +292,8 @@ public static class SeedData
                 WorkoutPlanId = pushPlan.Id,
                 ExerciseId = pushExercises[i].Id,
                 Order = i + 1,
-                DefaultSets = i < 4 ? 4 : 3, // First 4 exercises have 4 sets, rest have 3
-                DefaultReps = i < 8 ? 12 : 15, // First 8 exercises have 12 reps, rest have 15
+                Sets = i < 4 ? 4 : 3, // First 4 exercises have 4 sets, rest have 3
+                Reps = i < 8 ? 12 : 15, // First 8 exercises have 12 reps, rest have 15
                 DefaultRestTime = TimeSpan.FromSeconds(60)
             });
         }
@@ -331,8 +331,8 @@ public static class SeedData
                 WorkoutPlanId = pullPlan.Id,
                 ExerciseId = pullExercises[i].Id,
                 Order = i + 1,
-                DefaultSets = i < 4 ? 4 : 3,
-                DefaultReps = i < 8 ? 12 : 15,
+                Sets = i < 4 ? 4 : 3,
+                Reps = i < 8 ? 12 : 15,
                 DefaultRestTime = TimeSpan.FromSeconds(60)
             });
         }
@@ -370,8 +370,8 @@ public static class SeedData
                 WorkoutPlanId = legsPlan.Id,
                 ExerciseId = legExercises[i].Id,
                 Order = i + 1,
-                DefaultSets = i < 4 ? 4 : 3,
-                DefaultReps = i < 8 ? 12 : 15,
+                Sets = i < 4 ? 4 : 3,
+                Reps = i < 8 ? 12 : 15,
                 DefaultRestTime = TimeSpan.FromSeconds(90) // Legs need more rest
             });
         }

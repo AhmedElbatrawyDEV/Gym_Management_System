@@ -12,8 +12,11 @@ public class User : BaseEntity
     public DateTime DateOfBirth { get; set; }
     public Gender Gender { get; set; }
     public string? ProfileImageUrl { get; set; }
-    public bool IsActive { get; set; } = true;
-    
+    public int Status { get; set; } 
+
+    public string MembershipNumber { get; set; } = string.Empty;
+    public string Language { get; set; } = string.Empty;
+
     // Navigation Properties
     public virtual ICollection<WorkoutSession> WorkoutSessions { get; set; } = new List<WorkoutSession>();
     public virtual ICollection<UserWorkoutPlan> UserWorkoutPlans { get; set; } = new List<UserWorkoutPlan>();

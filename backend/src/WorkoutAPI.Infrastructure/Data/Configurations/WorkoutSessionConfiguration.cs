@@ -57,7 +57,7 @@ public class WorkoutSessionConfiguration : IEntityTypeConfiguration<WorkoutSessi
             .HasForeignKey(ws => ws.WorkoutPlanId)
             .OnDelete(DeleteBehavior.Restrict);
             
-        builder.HasMany<WorkoutExerciseSession>()
+        builder.HasMany<WorkoutSessionExercise>()
             .WithOne(wes => wes.WorkoutSession)
             .HasForeignKey(wes => wes.WorkoutSessionId)
             .OnDelete(DeleteBehavior.Cascade);

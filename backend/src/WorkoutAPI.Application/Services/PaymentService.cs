@@ -1,7 +1,9 @@
 using Mapster;
 using Microsoft.Extensions.Logging;
 using WorkoutAPI.Application.DTOs;
+using WorkoutAPI.Application.DTOs.WorkoutAPI.Application.DTOs;
 using WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 using WorkoutAPI.Domain.Interfaces;
 
@@ -9,161 +11,147 @@ namespace WorkoutAPI.Application.Services;
 
 public interface IPaymentService
 {
-    Task<PaymentResponse> CreatePaymentAsync(CreatePaymentRequest request);
-    Task<PaymentResponse> UpdatePaymentAsync(Guid paymentId, UpdatePaymentRequest request);
-    Task<PaymentResponse?> GetPaymentByIdAsync(Guid paymentId);
-    Task<IEnumerable<PaymentResponse>> GetPaymentsByMemberIdAsync(Guid memberId);
-    Task<IEnumerable<PaymentResponse>> GetPaymentsByStatusAsync(PaymentStatus status);
-    Task<IEnumerable<PaymentResponse>> GetPaymentsByDateRangeAsync(DateTime startDate, DateTime endDate);
-    Task<decimal> GetTotalRevenueAsync();
-    Task<decimal> GetRevenueByDateRangeAsync(DateTime startDate, DateTime endDate);
-    Task<bool> DeletePaymentAsync(Guid paymentId);
+    Task<PaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request);
+    Task<PaymentResponse> GetPaymentAsync(Guid id);
+    Task<IEnumerable<PaymentResponse>> GetUserPaymentsAsync(Guid userId);
+    Task<InvoiceResponse> GetInvoiceAsync(Guid paymentId);
+    Task<IEnumerable<InvoiceResponse>> GetUserInvoicesAsync(Guid userId);
 }
 
 public class PaymentService : IPaymentService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<PaymentService> _logger;
+    private readonly WorkoutDbContext _context;
 
-    public PaymentService(IUnitOfWork unitOfWork, ILogger<PaymentService> logger)
+    public PaymentService(WorkoutDbContext context)
     {
-        _unitOfWork = unitOfWork;
-        _logger = logger;
+        _context = context;
     }
 
-    public async Task<PaymentResponse> CreatePaymentAsync(CreatePaymentRequest request)
+    public async Task<PaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request)
     {
-        _logger.LogInformation("Creating new payment for member ID: {MemberId}", request.MemberId);
+        var user = await _context.Users
+            .FirstOrDefaultAsync(u => u.Id == request.UserId);
 
-        // Check if member exists
-        var member = await _unitOfWork.Members.GetByIdAsync(request.MemberId);
-        if (member == null)
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        var payment = new Payment
         {
-            throw new ArgumentException($"Member with ID {request.MemberId} not found");
-        }
+            Id = Guid.NewGuid(),
+            UserId = request.UserId,
+            Amount = request.Amount,
+            Currency = request.Currency,
+            PaymentMethod = request.PaymentMethod,
+            Status = PaymentStatus.Pending,
+            Description = request.Description,
+            Metadata = request.Metadata,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        var payment = request.Adapt<Payment>();
-        await _unitOfWork.Payments.AddAsync(payment);
-        await _unitOfWork.SaveChangesAsync();
+        _context.Payments.Add(payment);
 
-        _logger.LogInformation("Payment created successfully with ID: {PaymentId}", payment.Id);
+        // Simulate payment processing
+        payment.Status = PaymentStatus.Completed;
+        payment.PaymentDate = DateTime.UtcNow;
+        payment.TransactionId = Guid.NewGuid().ToString("N")[..16];
 
-        var result = await GetPaymentByIdAsync(payment.Id);
-        return result!;
+        // Create invoice
+        var invoice = new Invoice
+        {
+            Id = Guid.NewGuid(),
+            UserId = request.UserId,
+            PaymentId = payment.Id,
+            InvoiceNumber = GenerateInvoiceNumber(),
+            Amount = request.Amount,
+            TaxAmount = request.Amount * 0.15m, // 15% VAT
+            TotalAmount = request.Amount * 1.15m,
+            Status = InvoiceStatus.Paid,
+            PaidAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.Invoices.Add(invoice);
+        await _context.SaveChangesAsync();
+
+        return MapPaymentToResponse(payment);
     }
 
-    public async Task<PaymentResponse> UpdatePaymentAsync(Guid paymentId, UpdatePaymentRequest request)
+    public async Task<PaymentResponse> GetPaymentAsync(Guid id)
     {
-        _logger.LogInformation("Updating payment with ID: {PaymentId}", paymentId);
+        var payment = await _context.Payments
+            .FirstOrDefaultAsync(p => p.Id == id);
 
-        var payment = await _unitOfWork.Payments.GetByIdAsync(paymentId);
         if (payment == null)
-        {
-            throw new ArgumentException($"Payment with ID {paymentId} not found");
-        }
+            throw new KeyNotFoundException("Payment not found");
 
-        payment.Amount = request.Amount;
-        payment.PaymentDate = request.PaymentDate;
-        payment.Status = request.Status;
-        payment.Description = request.Description;
-        payment.SetUpdated();
-
-        _unitOfWork.Payments.Update(payment);
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("Payment updated successfully with ID: {PaymentId}", paymentId);
-
-        var result = await GetPaymentByIdAsync(paymentId);
-        return result!;
+        return MapPaymentToResponse(payment);
     }
 
-    public async Task<PaymentResponse?> GetPaymentByIdAsync(Guid paymentId)
+    public async Task<IEnumerable<PaymentResponse>> GetUserPaymentsAsync(Guid userId)
     {
-        var payment = await _unitOfWork.Payments.GetByIdAsync(paymentId);
-        if (payment == null) return null;
+        var payments = await _context.Payments
+            .Where(p => p.UserId == userId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
 
+        return payments.Select(MapPaymentToResponse);
+    }
+
+    public async Task<InvoiceResponse> GetInvoiceAsync(Guid paymentId)
+    {
+        var invoice = await _context.Invoices
+            .FirstOrDefaultAsync(i => i.PaymentId == paymentId);
+
+        if (invoice == null)
+            throw new KeyNotFoundException("Invoice not found");
+
+        return MapInvoiceToResponse(invoice);
+    }
+
+    public async Task<IEnumerable<InvoiceResponse>> GetUserInvoicesAsync(Guid userId)
+    {
+        var invoices = await _context.Invoices
+            .Where(i => i.UserId == userId)
+            .OrderByDescending(i => i.CreatedAt)
+            .ToListAsync();
+
+        return invoices.Select(MapInvoiceToResponse);
+    }
+
+    private static string GenerateInvoiceNumber()
+    {
+        return $"INV-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
+    }
+
+    private static PaymentResponse MapPaymentToResponse(Payment payment)
+    {
         return new PaymentResponse(
-            payment.Id,
-            payment.MemberId,
-            payment.Member.User.FullName,
-            payment.Amount,
-            payment.PaymentDate,
-            payment.Status,
-            payment.Description,
-            payment.CreatedAt
+            Id: payment.Id,
+            UserId: payment.UserId,
+            Amount: payment.Amount,
+            Currency: payment.Currency,
+            PaymentMethod: payment.PaymentMethod,
+            Status: payment.Status,
+            PaymentDate: payment.PaymentDate,
+            TransactionId: payment.TransactionId,
+            Description: payment.Description,
+            CreatedAt: payment.CreatedAt
         );
     }
 
-    public async Task<IEnumerable<PaymentResponse>> GetPaymentsByMemberIdAsync(Guid memberId)
+    private static InvoiceResponse MapInvoiceToResponse(Invoice invoice)
     {
-        var payments = await _unitOfWork.Payments.GetPaymentsByMemberIdAsync(memberId);
-        return payments.Select(p => new PaymentResponse(
-            p.Id,
-            p.MemberId,
-            p.Member.User.FullName,
-            p.Amount,
-            p.PaymentDate,
-            p.Status,
-            p.Description,
-            p.CreatedAt
-        ));
-    }
-
-    public async Task<IEnumerable<PaymentResponse>> GetPaymentsByStatusAsync(PaymentStatus status)
-    {
-        var payments = await _unitOfWork.Payments.GetPaymentsByStatusAsync(status);
-        return payments.Select(p => new PaymentResponse(
-            p.Id,
-            p.MemberId,
-            p.Member.User.FullName,
-            p.Amount,
-            p.PaymentDate,
-            p.Status,
-            p.Description,
-            p.CreatedAt
-        ));
-    }
-
-    public async Task<IEnumerable<PaymentResponse>> GetPaymentsByDateRangeAsync(DateTime startDate, DateTime endDate)
-    {
-        var payments = await _unitOfWork.Payments.GetPaymentsByDateRangeAsync(startDate, endDate);
-        return payments.Select(p => new PaymentResponse(
-            p.Id,
-            p.MemberId,
-            p.Member.User.FullName,
-            p.Amount,
-            p.PaymentDate,
-            p.Status,
-            p.Description,
-            p.CreatedAt
-        ));
-    }
-
-    public async Task<decimal> GetTotalRevenueAsync()
-    {
-        return await _unitOfWork.Payments.GetTotalRevenueAsync();
-    }
-
-    public async Task<decimal> GetRevenueByDateRangeAsync(DateTime startDate, DateTime endDate)
-    {
-        return await _unitOfWork.Payments.GetRevenueByDateRangeAsync(startDate, endDate);
-    }
-
-    public async Task<bool> DeletePaymentAsync(Guid paymentId)
-    {
-        _logger.LogInformation("Deleting payment with ID: {PaymentId}", paymentId);
-
-        var payment = await _unitOfWork.Payments.GetByIdAsync(paymentId);
-        if (payment == null)
-        {
-            return false;
-        }
-
-        _unitOfWork.Payments.Remove(payment);
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("Payment deleted successfully with ID: {PaymentId}", paymentId);
-
-        return true;
+        return new InvoiceResponse(
+            Id: invoice.Id,
+            InvoiceNumber: invoice.InvoiceNumber,
+            UserId: invoice.UserId,
+            PaymentId: invoice.PaymentId,
+            Amount: invoice.Amount,
+            TaxAmount: invoice.TaxAmount,
+            TotalAmount: invoice.TotalAmount,
+            Status: invoice.Status,
+            CreatedAt: invoice.CreatedAt,
+            PaidAt: invoice.PaidAt
+        );
     }
 }

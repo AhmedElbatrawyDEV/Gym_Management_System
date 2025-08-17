@@ -1,1 +1,7 @@
-namespace WorkoutAPI.Domain.Enums; public enum SubscriptionStatus { Active, Inactive, Suspended, Expired }
+public enum SubscriptionStatus
+{
+    Active = 1,
+    Expired = 2,
+    Cancelled = 3,
+    Suspended = 4
+}

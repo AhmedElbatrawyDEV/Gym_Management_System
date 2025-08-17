@@ -7,3 +7,9 @@ public enum ExerciseType
     Legs = 3
 }
 
+public enum ExerciseDifficulty
+{
+    Easy = 1,
+    Normal = 2,
+    Hard = 3
+}

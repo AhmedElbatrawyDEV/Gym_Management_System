@@ -43,7 +43,7 @@ public static class MappingProfile
             .Map(dest => dest.WorkoutPlanName, src => GetWorkoutPlanTranslation(src.WorkoutPlan.Translations, Language.Arabic).Name)
             .Map(dest => dest.WorkoutType, src => src.WorkoutPlan.Type);
 
-        TypeAdapterConfig<WorkoutExerciseSession, WorkoutExerciseSessionResponse>
+        TypeAdapterConfig<WorkoutSessionExercise, WorkoutExerciseSessionResponse>
             .NewConfig()
             .Map(dest => dest.ExerciseName, src => GetTranslation(src.Exercise.Translations, Language.Arabic).Name)
             .Map(dest => dest.ExerciseDescription, src => GetTranslation(src.Exercise.Translations, Language.Arabic).Description)

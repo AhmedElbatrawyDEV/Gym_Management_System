@@ -1,8 +1,20 @@
 using WorkoutAPI.Domain.Common;
-namespace WorkoutAPI.Domain.Entities;
-public class ClassBooking : BaseEntity
+using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Enums;
+
+
+namespace WorkoutAPI.Domain.Entities
 {
-    public Guid GymClassId { get; set; }
-    public Guid MemberProfileId { get; set; }
-    public bool Attended { get; set; } = false;
+
+    public class ClassBooking : BaseEntity
+    {
+        public Guid UserId { get; set; }
+        public Guid ClassScheduleId { get; set; }
+        public DateTime BookingDate { get; set; }
+        public BookingStatus Status { get; set; }
+
+        // Navigation properties
+        public User User { get; set; } = null!;
+        public ClassSchedule ClassSchedule { get; set; } = null!;
+    }
 }

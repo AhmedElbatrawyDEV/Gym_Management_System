@@ -1,29 +1,23 @@
 using WorkoutAPI.Domain.Common;
+using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
-
-namespace WorkoutAPI.Domain.Entities;
 
 public class Payment : BaseEntity
 {
-    public Guid MemberId { get; set; }
-    public Member Member { get; set; } = null!;
+    public Guid UserId { get; set; }
+    public Guid? UserSubscriptionId { get; set; }
     public decimal Amount { get; set; }
-    public DateTime PaymentDate { get; set; }
+    public string Currency { get; set; } = "SAR";
+    public PaymentMethod PaymentMethod { get; set; }
     public PaymentStatus Status { get; set; }
-    public string Description { get; set; } = string.Empty;
-}
+    public DateTime? PaymentDate { get; set; }
+    public string? TransactionId { get; set; }
+    public string? Description { get; set; }
+    public Dictionary<string, string>? Metadata { get; set; }
 
-
-
-using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums;
-namespace WorkoutAPI.Domain.Entities;
-public class Payment : BaseEntity
-{
-    public Guid SubscriptionId { get; set; }
-    public decimal Amount { get; set; }
-    public DateTime PaidAt { get; set; } = DateTime.UtcNow;
-    public PaymentStatus Status { get; set; } = PaymentStatus.Paid;
-    public string? Provider { get; set; }
-    public string? Reference { get; set; }
+    // Navigation properties
+    public User User { get; set; } = null!;
+    public UserSubscription? UserSubscription { get; set; }
+    public Invoice? Invoice { get; set; }
 }

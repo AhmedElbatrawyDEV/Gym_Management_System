@@ -7,6 +7,7 @@ public class WorkoutPlan : BaseEntity
 {
     public string Code { get; set; } = string.Empty;
     public ExerciseType Type { get; set; }
+    public ExerciseDifficulty Difficulty { get; set; }
     public int TotalExercises { get; set; }
     public int EstimatedDurationMinutes { get; set; }
     public bool IsActive { get; set; } = true;

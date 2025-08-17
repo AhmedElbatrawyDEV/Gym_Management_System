@@ -7,8 +7,10 @@ public class WorkoutPlanExercise : BaseEntity
     public Guid WorkoutPlanId { get; set; }
     public Guid ExerciseId { get; set; }
     public int Order { get; set; }
-    public int DefaultSets { get; set; }
-    public int DefaultReps { get; set; }
+    public int Sets { get; set; }
+    public int Reps { get; set; }
+    public int Weight { get; set; }
+    public int RestSeconds { get; set; }
     public TimeSpan DefaultRestTime { get; set; }
     public string? Notes { get; set; }
     

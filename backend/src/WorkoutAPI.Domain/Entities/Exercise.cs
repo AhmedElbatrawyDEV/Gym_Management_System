@@ -16,6 +16,6 @@ public class Exercise : BaseEntity
     // Navigation Properties
     public virtual ICollection<ExerciseTranslation> Translations { get; set; } = new List<ExerciseTranslation>();
     public virtual ICollection<WorkoutPlanExercise> WorkoutPlanExercises { get; set; } = new List<WorkoutPlanExercise>();
-    public virtual ICollection<WorkoutExerciseSession> WorkoutExerciseSessions { get; set; } = new List<WorkoutExerciseSession>();
+    public virtual ICollection<WorkoutSessionExercise> WorkoutExerciseSessions { get; set; } = new List<WorkoutSessionExercise>();
 }
 

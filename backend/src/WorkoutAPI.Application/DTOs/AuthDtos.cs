@@ -1,5 +1,54 @@
 using WorkoutAPI.Domain.Enums;
-namespace WorkoutAPI.Application.DTOs;
-public record RegisterRequest(string Email, string Password, string FirstName, string LastName, Role Role);
-public record LoginRequest(string Email, string Password);
-public record AuthResponse(string AccessToken, string Email, string FullName, Role Role);
+
+// DTOs/AttendanceDTOs.cs
+namespace WorkoutAPI.Application.DTOs
+{
+    public record CheckInRequest(
+        Guid UserId,
+        ActivityType ActivityType = ActivityType.GeneralWorkout
+    );
+
+    public record AttendanceRecordResponse(
+        Guid Id,
+        Guid UserId,
+        DateTime CheckInTime,
+        DateTime? CheckOutTime,
+        int? DurationMinutes,
+        ActivityType ActivityType
+    );
+
+    public record CreateGymClassRequest(
+        string Name,
+        string Description,
+        Guid? InstructorId,
+        int MaxCapacity,
+        TimeSpan Duration,
+        DifficultyLevel Difficulty = DifficultyLevel.Beginner
+    );
+
+    public record GymClassResponse(
+        Guid Id,
+        string Name,
+        string Description,
+        Guid? InstructorId,
+        string? InstructorName,
+        int MaxCapacity,
+        int CurrentBookings,
+        TimeSpan Duration,
+        DifficultyLevel Difficulty,
+        bool IsActive,
+        DateTime CreatedAt
+    );
+
+    public record BookClassRequest(
+        Guid UserId
+    );
+
+    public record ClassBookingResponse(
+        Guid Id,
+        Guid UserId,
+        Guid ClassScheduleId,
+        DateTime BookingDate,
+        BookingStatus Status
+    );
+}

@@ -25,8 +25,8 @@ public class WorkoutSession : AggregateRoot
     public int TotalExercises => _totalExercises;
     public string? Notes => _notes;
     
-    private readonly List<WorkoutExerciseSession> _exercises = new();
-    public virtual IReadOnlyCollection<WorkoutExerciseSession> Exercises => _exercises.AsReadOnly();
+    private readonly List<WorkoutSessionExercise> _exercises = new();
+    public virtual IReadOnlyCollection<WorkoutSessionExercise> Exercises => _exercises.AsReadOnly();
     
     // Navigation Properties
     public virtual User User { get; set; } = null!;
@@ -64,7 +64,7 @@ public class WorkoutSession : AggregateRoot
         exercise.CompleteSets(sets);
         _completedExercises++;
         
-        var totalWeight = sets.Sum(s => s.ActualWeight * s.ActualReps);
+        var totalWeight = sets.Sum(s => s.Weight * s.Reps);
         AddDomainEvent(new ExerciseCompletedEvent(_userId, Id, exerciseId, sets.Count, totalWeight));
         
         if (_completedExercises >= _totalExercises)
