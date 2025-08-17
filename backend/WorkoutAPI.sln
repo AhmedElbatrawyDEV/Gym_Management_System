@@ -4,11 +4,11 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Domain", "src\WorkoutAPI.Domain\WorkoutAPI.Domain.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Infrastructure", "src\WorkoutAPI.Infrastructure\WorkoutAPI.Infrastructure.csproj", "{F002DB7F-C24B-4038-A168-BBF2F54D9501}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Infrastructure", "src\WorkoutAPI.Infrastructure\WorkoutAPI.Infrastructure.csproj", "{63A74815-E1A4-4F2A-B586-7285200587E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Application", "src\WorkoutAPI.Application\WorkoutAPI.Application.csproj", "{57F604A1-E714-45AE-BE7B-AF31C5B04D27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Application", "src\WorkoutAPI.Application\WorkoutAPI.Application.csproj", "{CFDAB33E-464C-40F3-A0C2-AE181FA4A8F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Api", "src\WorkoutAPI.Api\WorkoutAPI.Api.csproj", "{0CFB36C3-4173-4FF0-8E6C-269EA0FA3B57}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkoutAPI.Api", "src\WorkoutAPI.Api\WorkoutAPI.Api.csproj", "{553FFC4D-1264-4B2E-A282-7F9438E2E500}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,18 +20,18 @@ Global
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F002DB7F-C24B-4038-A168-BBF2F54D9501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F002DB7F-C24B-4038-A168-BBF2F54D9501}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F002DB7F-C24B-4038-A168-BBF2F54D9501}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F002DB7F-C24B-4038-A168-BBF2F54D9501}.Release|Any CPU.Build.0 = Release|Any CPU
-		{57F604A1-E714-45AE-BE7B-AF31C5B04D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57F604A1-E714-45AE-BE7B-AF31C5B04D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57F604A1-E714-45AE-BE7B-AF31C5B04D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57F604A1-E714-45AE-BE7B-AF31C5B04D27}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0CFB36C3-4173-4FF0-8E6C-269EA0FA3B57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0CFB36C3-4173-4FF0-8E6C-269EA0FA3B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0CFB36C3-4173-4FF0-8E6C-269EA0FA3B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0CFB36C3-4173-4FF0-8E6C-269EA0FA3B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63A74815-E1A4-4F2A-B586-7285200587E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63A74815-E1A4-4F2A-B586-7285200587E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63A74815-E1A4-4F2A-B586-7285200587E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63A74815-E1A4-4F2A-B586-7285200587E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFDAB33E-464C-40F3-A0C2-AE181FA4A8F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFDAB33E-464C-40F3-A0C2-AE181FA4A8F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFDAB33E-464C-40F3-A0C2-AE181FA4A8F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFDAB33E-464C-40F3-A0C2-AE181FA4A8F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{553FFC4D-1264-4B2E-A282-7F9438E2E500}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{553FFC4D-1264-4B2E-A282-7F9438E2E500}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{553FFC4D-1264-4B2E-A282-7F9438E2E500}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{553FFC4D-1264-4B2E-A282-7F9438E2E500}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

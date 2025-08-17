@@ -60,12 +60,27 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created
+// Ensure database is created and seeded
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<WorkoutDbContext>();
-    context.Database.EnsureCreated();
+    
+    try
+    {
+        // Ensure database is created
+        await context.Database.EnsureCreatedAsync();
+        
+        // Seed the database with initial data
+        await SeedData.SeedAsync(context);
+        
+        Console.WriteLine("Database seeded successfully!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
+        // Log the error but don't crash the application
+    }
 }
 
-app.Run("http://0.0.0.0:5000");
+app.Run("http://0.0.0.0:5002");
 

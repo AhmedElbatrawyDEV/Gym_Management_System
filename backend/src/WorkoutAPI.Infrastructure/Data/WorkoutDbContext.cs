@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Infrastructure.Data;
 
