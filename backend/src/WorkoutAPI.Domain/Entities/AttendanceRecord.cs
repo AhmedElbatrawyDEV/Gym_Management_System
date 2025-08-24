@@ -1,12 +1,9 @@
 ﻿using WorkoutAPI.Domain.Common;
 using WorkoutAPI.Domain.Enums;
-namespace WorkoutAPI.Domain.Entities;
 
 
-namespace WorkoutAPI.Domain.Entities
-{
-    public class AttendanceRecord : BaseEntity
-    {
+namespace WorkoutAPI.Domain.Entities {
+    public class AttendanceRecord : BaseEntity {
         public Guid UserId { get; set; }
         public DateTime CheckInTime { get; set; }
         public DateTime? CheckOutTime { get; set; }
@@ -16,8 +13,7 @@ namespace WorkoutAPI.Domain.Entities
         // Navigation properties
         public User User { get; set; } = null!;
 
-        public void CheckOut()
-        {
+        public void CheckOut() {
             if (CheckOutTime.HasValue)
                 throw new InvalidOperationException("User has already checked out");
 

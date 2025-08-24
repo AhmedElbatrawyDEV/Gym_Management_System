@@ -3,8 +3,7 @@ using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Member : BaseEntity
-{
+public class Member : BaseEntity {
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
     public DateTime MembershipStartDate { get; set; }

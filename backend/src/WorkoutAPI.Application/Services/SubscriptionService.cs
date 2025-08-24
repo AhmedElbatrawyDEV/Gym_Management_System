@@ -1,11 +1,8 @@
 ﻿// Services/IAdminService.cs
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 
-namespace WorkoutAPI.Application.Services
-{
-    public interface ISubscriptionService
-    {
+namespace WorkoutAPI.Application.Services {
+    public interface ISubscriptionService {
         Task<IEnumerable<SubscriptionPlanResponse>> GetAllPlansAsync();
         Task<SubscriptionPlanResponse> CreatePlanAsync(CreateSubscriptionPlanRequest request);
         Task<SubscriptionPlanResponse> UpdatePlanAsync(Guid id, UpdateSubscriptionPlanRequest request);
@@ -15,17 +12,14 @@ namespace WorkoutAPI.Application.Services
         Task CancelSubscriptionAsync(Guid subscriptionId);
     }
     // SubscriptionService.cs
-    public class SubscriptionService : ISubscriptionService
-    {
+    public class SubscriptionService : ISubscriptionService {
         private readonly WorkoutDbContext _context;
 
-        public SubscriptionService(WorkoutDbContext context)
-        {
+        public SubscriptionService(WorkoutDbContext context) {
             _context = context;
         }
 
-        public async Task<IEnumerable<SubscriptionPlanResponse>> GetAllPlansAsync()
-        {
+        public async Task<IEnumerable<SubscriptionPlanResponse>> GetAllPlansAsync() {
             var plans = await _context.SubscriptionPlans
                 .Where(p => p.IsActive)
                 .OrderBy(p => p.Price)
@@ -34,10 +28,8 @@ namespace WorkoutAPI.Application.Services
             return plans.Select(MapPlanToResponse);
         }
 
-        public async Task<SubscriptionPlanResponse> CreatePlanAsync(CreateSubscriptionPlanRequest request)
-        {
-            var plan = new SubscriptionPlan
-            {
+        public async Task<SubscriptionPlanResponse> CreatePlanAsync(CreateSubscriptionPlanRequest request) {
+            var plan = new SubscriptionPlan {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
@@ -54,8 +46,7 @@ namespace WorkoutAPI.Application.Services
             return MapPlanToResponse(plan);
         }
 
-        public async Task<SubscriptionPlanResponse> UpdatePlanAsync(Guid id, UpdateSubscriptionPlanRequest request)
-        {
+        public async Task<SubscriptionPlanResponse> UpdatePlanAsync(Guid id, UpdateSubscriptionPlanRequest request) {
             var plan = await _context.SubscriptionPlans
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -75,8 +66,7 @@ namespace WorkoutAPI.Application.Services
             return MapPlanToResponse(plan);
         }
 
-        public async Task<UserSubscriptionResponse> AssignSubscriptionAsync(Guid userId, AssignSubscriptionRequest request)
-        {
+        public async Task<UserSubscriptionResponse> AssignSubscriptionAsync(Guid userId, AssignSubscriptionRequest request) {
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -92,8 +82,7 @@ namespace WorkoutAPI.Application.Services
             var startDate = request.StartDate ?? DateTime.UtcNow;
             var endDate = startDate.AddDays(plan.DurationDays);
 
-            var subscription = new UserSubscription
-            {
+            var subscription = new UserSubscription {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 SubscriptionPlanId = request.SubscriptionPlanId,
@@ -115,8 +104,7 @@ namespace WorkoutAPI.Application.Services
             return MapSubscriptionToResponse(subscription);
         }
 
-        public async Task<IEnumerable<UserSubscriptionResponse>> GetUserSubscriptionsAsync(Guid userId)
-        {
+        public async Task<IEnumerable<UserSubscriptionResponse>> GetUserSubscriptionsAsync(Guid userId) {
             var subscriptions = await _context.UserSubscriptions
                 .Include(s => s.SubscriptionPlan)
                 .Where(s => s.UserId == userId)
@@ -126,8 +114,7 @@ namespace WorkoutAPI.Application.Services
             return subscriptions.Select(MapSubscriptionToResponse);
         }
 
-        public async Task<UserSubscriptionResponse> ExtendSubscriptionAsync(Guid subscriptionId, int extensionDays)
-        {
+        public async Task<UserSubscriptionResponse> ExtendSubscriptionAsync(Guid subscriptionId, int extensionDays) {
             var subscription = await _context.UserSubscriptions
                 .Include(s => s.SubscriptionPlan)
                 .FirstOrDefaultAsync(s => s.Id == subscriptionId);
@@ -143,8 +130,7 @@ namespace WorkoutAPI.Application.Services
             return MapSubscriptionToResponse(subscription);
         }
 
-        public async Task CancelSubscriptionAsync(Guid subscriptionId)
-        {
+        public async Task CancelSubscriptionAsync(Guid subscriptionId) {
             var subscription = await _context.UserSubscriptions
                 .FirstOrDefaultAsync(s => s.Id == subscriptionId);
 
@@ -158,8 +144,7 @@ namespace WorkoutAPI.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        private static SubscriptionPlanResponse MapPlanToResponse(SubscriptionPlan plan)
-        {
+        private static SubscriptionPlanResponse MapPlanToResponse(SubscriptionPlan plan) {
             return new SubscriptionPlanResponse(
                 Id: plan.Id,
                 Name: plan.Name,
@@ -172,8 +157,7 @@ namespace WorkoutAPI.Application.Services
             );
         }
 
-        private static UserSubscriptionResponse MapSubscriptionToResponse(UserSubscription subscription)
-        {
+        private static UserSubscriptionResponse MapSubscriptionToResponse(UserSubscription subscription) {
             return new UserSubscriptionResponse(
                 Id: subscription.Id,
                 UserId: subscription.UserId,

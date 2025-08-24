@@ -1,8 +1,7 @@
 using WorkoutAPI.Domain.Enums;
 
 // DTOs/AttendanceDTOs.cs
-namespace WorkoutAPI.Application.DTOs
-{
+namespace WorkoutAPI.Application.DTOs {
     public record CheckInRequest(
         Guid UserId,
         ActivityType ActivityType = ActivityType.GeneralWorkout

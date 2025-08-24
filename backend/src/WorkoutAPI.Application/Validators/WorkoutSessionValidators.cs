@@ -3,10 +3,8 @@ using WorkoutAPI.Application.DTOs;
 
 namespace WorkoutAPI.Application.Validators;
 
-public class StartWorkoutSessionRequestValidator : AbstractValidator<StartWorkoutSessionRequest>
-{
-    public StartWorkoutSessionRequestValidator()
-    {
+public class StartWorkoutSessionRequestValidator : AbstractValidator<StartWorkoutSessionRequest> {
+    public StartWorkoutSessionRequestValidator() {
         RuleFor(x => x.UserId)
             .NotEmpty().WithMessage("User ID is required");
 
@@ -15,10 +13,8 @@ public class StartWorkoutSessionRequestValidator : AbstractValidator<StartWorkou
     }
 }
 
-public class CompleteExerciseRequestValidator : AbstractValidator<CompleteExerciseRequest>
-{
-    public CompleteExerciseRequestValidator()
-    {
+public class CompleteExerciseRequestValidator : AbstractValidator<CompleteExerciseRequest> {
+    public CompleteExerciseRequestValidator() {
         RuleFor(x => x.ExerciseId)
             .NotEmpty().WithMessage("Exercise ID is required");
 
@@ -30,10 +26,8 @@ public class CompleteExerciseRequestValidator : AbstractValidator<CompleteExerci
     }
 }
 
-public class ExerciseSetRequestValidator : AbstractValidator<ExerciseSetRequest>
-{
-    public ExerciseSetRequestValidator()
-    {
+public class ExerciseSetRequestValidator : AbstractValidator<ExerciseSetRequest> {
+    public ExerciseSetRequestValidator() {
         RuleFor(x => x.SetNumber)
             .GreaterThan(0).WithMessage("Set number must be greater than 0")
             .LessThanOrEqualTo(10).WithMessage("Set number cannot exceed 10");
@@ -56,10 +50,8 @@ public class ExerciseSetRequestValidator : AbstractValidator<ExerciseSetRequest>
     }
 }
 
-public class CompleteWorkoutSessionRequestValidator : AbstractValidator<CompleteWorkoutSessionRequest>
-{
-    public CompleteWorkoutSessionRequestValidator()
-    {
+public class CompleteWorkoutSessionRequestValidator : AbstractValidator<CompleteWorkoutSessionRequest> {
+    public CompleteWorkoutSessionRequestValidator() {
         RuleFor(x => x.Notes)
             .MaximumLength(1000).WithMessage("Notes cannot exceed 1000 characters")
             .When(x => !string.IsNullOrEmpty(x.Notes));

@@ -1,7 +1,6 @@
 using WorkoutAPI.Domain.Common;
 namespace WorkoutAPI.Domain.Entities;
-public class Translation : BaseEntity
-{
+public class Translation : BaseEntity {
     public string EntityType { get; set; } = default!; // "Exercise" or "WorkoutPlan"
     public Guid EntityId { get; set; }
     public string Culture { get; set; } = "en";

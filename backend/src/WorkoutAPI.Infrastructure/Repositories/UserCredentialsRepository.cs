@@ -6,28 +6,23 @@ using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class UserCredentialsRepository : Repository<UserCredentials>, IUserCredentialsRepository
-{
-    public UserCredentialsRepository(WorkoutDbContext context) : base(context)
-    {
+public class UserCredentialsRepository : Repository<UserCredentials>, IUserCredentialsRepository {
+    public UserCredentialsRepository(WorkoutDbContext context) : base(context) {
     }
 
-    public async Task<UserCredentials?> GetByUserIdAsync(Guid userId)
-    {
+    public async Task<UserCredentials?> GetByUserIdAsync(Guid userId) {
         return await _dbSet
             .Include(uc => uc.User)
             .FirstOrDefaultAsync(uc => uc.UserId == userId);
     }
 
-    public async Task<UserCredentials?> GetByEmailAsync(string email)
-    {
+    public async Task<UserCredentials?> GetByEmailAsync(string email) {
         return await _dbSet
             .Include(uc => uc.User)
             .FirstOrDefaultAsync(uc => uc.User.Email == email);
     }
 
-    public async Task<IEnumerable<UserCredentials>> GetByRoleAsync(UserRole role)
-    {
+    public async Task<IEnumerable<UserCredentials>> GetByRoleAsync(UserRole role) {
         return await _dbSet
             .Include(uc => uc.User)
             .Where(uc => uc.Role == role)
@@ -36,8 +31,7 @@ public class UserCredentialsRepository : Repository<UserCredentials>, IUserCrede
             .ToListAsync();
     }
 
-    public async Task<bool> UpdateLastLoginAsync(Guid userId)
-    {
+    public async Task<bool> UpdateLastLoginAsync(Guid userId) {
         var credentials = await _dbSet.FirstOrDefaultAsync(uc => uc.UserId == userId);
         if (credentials == null) return false;
 
@@ -46,8 +40,7 @@ public class UserCredentialsRepository : Repository<UserCredentials>, IUserCrede
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> IncrementFailedLoginAttemptsAsync(Guid userId)
-    {
+    public async Task<bool> IncrementFailedLoginAttemptsAsync(Guid userId) {
         var credentials = await _dbSet.FirstOrDefaultAsync(uc => uc.UserId == userId);
         if (credentials == null) return false;
 
@@ -56,8 +49,7 @@ public class UserCredentialsRepository : Repository<UserCredentials>, IUserCrede
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> ResetFailedLoginAttemptsAsync(Guid userId)
-    {
+    public async Task<bool> ResetFailedLoginAttemptsAsync(Guid userId) {
         var credentials = await _dbSet.FirstOrDefaultAsync(uc => uc.UserId == userId);
         if (credentials == null) return false;
 
@@ -66,8 +58,7 @@ public class UserCredentialsRepository : Repository<UserCredentials>, IUserCrede
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> LockUserAsync(Guid userId)
-    {
+    public async Task<bool> LockUserAsync(Guid userId) {
         var credentials = await _dbSet.FirstOrDefaultAsync(uc => uc.UserId == userId);
         if (credentials == null) return false;
 
@@ -76,8 +67,7 @@ public class UserCredentialsRepository : Repository<UserCredentials>, IUserCrede
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> UnlockUserAsync(Guid userId)
-    {
+    public async Task<bool> UnlockUserAsync(Guid userId) {
         var credentials = await _dbSet.FirstOrDefaultAsync(uc => uc.UserId == userId);
         if (credentials == null) return false;
 

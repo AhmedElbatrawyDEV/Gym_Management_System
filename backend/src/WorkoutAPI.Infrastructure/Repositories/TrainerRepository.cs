@@ -5,21 +5,17 @@ using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class TrainerRepository : Repository<Trainer>, ITrainerRepository
-{
-    public TrainerRepository(WorkoutDbContext context) : base(context)
-    {
+public class TrainerRepository : Repository<Trainer>, ITrainerRepository {
+    public TrainerRepository(WorkoutDbContext context) : base(context) {
     }
 
-    public async Task<Trainer?> GetByUserIdAsync(Guid userId)
-    {
+    public async Task<Trainer?> GetByUserIdAsync(Guid userId) {
         return await _dbSet
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.UserId == userId);
     }
 
-    public async Task<IEnumerable<Trainer>> GetAvailableTrainersAsync()
-    {
+    public async Task<IEnumerable<Trainer>> GetAvailableTrainersAsync() {
         return await _dbSet
             .Include(t => t.User)
             .Where(t => t.IsAvailable && t.User.IsActive)
@@ -28,16 +24,14 @@ public class TrainerRepository : Repository<Trainer>, ITrainerRepository
             .ToListAsync();
     }
 
-    public async Task<Trainer?> GetTrainerWithSchedulesAsync(Guid trainerId)
-    {
+    public async Task<Trainer?> GetTrainerWithSchedulesAsync(Guid trainerId) {
         return await _dbSet
             .Include(t => t.User)
             .Include(t => t.ScheduledSessions)
             .FirstOrDefaultAsync(t => t.Id == trainerId);
     }
 
-    public async Task<IEnumerable<Trainer>> GetTrainersBySpecializationAsync(string specialization)
-    {
+    public async Task<IEnumerable<Trainer>> GetTrainersBySpecializationAsync(string specialization) {
         return await _dbSet
             .Include(t => t.User)
             .Where(t => t.Specialization.Contains(specialization) && t.IsAvailable)

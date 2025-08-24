@@ -6,14 +6,11 @@ using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSessionRepository
-{
-    public WorkoutSessionRepository(WorkoutDbContext context) : base(context)
-    {
+public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSessionRepository {
+    public WorkoutSessionRepository(WorkoutDbContext context) : base(context) {
     }
 
-    public async Task<IEnumerable<WorkoutSession>> GetUserSessionsAsync(Guid userId)
-    {
+    public async Task<IEnumerable<WorkoutSession>> GetUserSessionsAsync(Guid userId) {
         return await _dbSet
             .Where(ws => ws.UserId == userId)
             .Include(ws => ws.WorkoutPlan)
@@ -22,18 +19,16 @@ public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSess
             .ToListAsync();
     }
 
-    public async Task<WorkoutSession?> GetActiveSessionAsync(Guid userId)
-    {
+    public async Task<WorkoutSession?> GetActiveSessionAsync(Guid userId) {
         return await _dbSet
-            .Where(ws => ws.UserId == userId && 
+            .Where(ws => ws.UserId == userId &&
                         (ws.Status == WorkoutSessionStatus.InProgress || ws.Status == WorkoutSessionStatus.Paused))
             .Include(ws => ws.WorkoutPlan)
                 .ThenInclude(wp => wp.Translations)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<WorkoutSession?> GetSessionWithExercisesAsync(Guid sessionId)
-    {
+    public async Task<WorkoutSession?> GetSessionWithExercisesAsync(Guid sessionId) {
         return await _dbSet
             .Where(ws => ws.Id == sessionId)
             .Include(ws => ws.WorkoutPlan)
@@ -46,8 +41,7 @@ public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSess
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<WorkoutSession>> GetCompletedSessionsAsync(Guid userId, DateTime? fromDate = null)
-    {
+    public async Task<IEnumerable<WorkoutSession>> GetCompletedSessionsAsync(Guid userId, DateTime? fromDate = null) {
         var query = _dbSet
             .Where(ws => ws.UserId == userId && ws.Status == WorkoutSessionStatus.Completed);
 
@@ -63,8 +57,7 @@ public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSess
             .ToListAsync();
     }
 
-    public async Task<WorkoutSession?> GetLatestSessionAsync(Guid userId)
-    {
+    public async Task<WorkoutSession?> GetLatestSessionAsync(Guid userId) {
         return await _dbSet
             .Where(ws => ws.UserId == userId)
             .Include(ws => ws.WorkoutPlan)

@@ -2,8 +2,7 @@ using WorkoutAPI.Domain.Common;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Schedule : BaseEntity
-{
+public class Schedule : BaseEntity {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public DateTime StartTime { get; set; }

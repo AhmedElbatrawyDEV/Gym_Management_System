@@ -6,21 +6,17 @@ using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class MemberRepository : Repository<Member>, IMemberRepository
-{
-    public MemberRepository(WorkoutDbContext context) : base(context)
-    {
+public class MemberRepository : Repository<Member>, IMemberRepository {
+    public MemberRepository(WorkoutDbContext context) : base(context) {
     }
 
-    public async Task<Member?> GetByUserIdAsync(Guid userId)
-    {
+    public async Task<Member?> GetByUserIdAsync(Guid userId) {
         return await _dbSet
             .Include(m => m.User)
             .FirstOrDefaultAsync(m => m.UserId == userId);
     }
 
-    public async Task<IEnumerable<Member>> GetActiveMembersAsync()
-    {
+    public async Task<IEnumerable<Member>> GetActiveMembersAsync() {
         return await _dbSet
             .Include(m => m.User)
             .Where(m => m.IsActiveMember && m.User.IsActive)
@@ -29,8 +25,7 @@ public class MemberRepository : Repository<Member>, IMemberRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Member>> GetMembersByMembershipTypeAsync(MembershipType membershipType)
-    {
+    public async Task<IEnumerable<Member>> GetMembersByMembershipTypeAsync(MembershipType membershipType) {
         return await _dbSet
             .Include(m => m.User)
             .Where(m => m.MembershipType == membershipType && m.IsActiveMember)
@@ -39,8 +34,7 @@ public class MemberRepository : Repository<Member>, IMemberRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Member>> GetExpiringMembershipsAsync(DateTime expirationDate)
-    {
+    public async Task<IEnumerable<Member>> GetExpiringMembershipsAsync(DateTime expirationDate) {
         return await _dbSet
             .Include(m => m.User)
             .Where(m => m.MembershipEndDate <= expirationDate && m.IsActiveMember)
@@ -48,8 +42,7 @@ public class MemberRepository : Repository<Member>, IMemberRepository
             .ToListAsync();
     }
 
-    public async Task<Member?> GetMemberWithWorkoutPlansAsync(Guid memberId)
-    {
+    public async Task<Member?> GetMemberWithWorkoutPlansAsync(Guid memberId) {
         return await _dbSet
             .Include(m => m.User)
             .Include(m => m.EnrolledWorkoutPlans)

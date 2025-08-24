@@ -5,17 +5,15 @@ using WorkoutAPI.Infrastructure.Repositories;
 
 namespace WorkoutAPI.Infrastructure;
 
-public class UnitOfWork : IUnitOfWork
-{
+public class UnitOfWork : IUnitOfWork {
     private readonly WorkoutDbContext _context;
     private IDbContextTransaction? _transaction;
-    
+
     private IUserRepository? _users;
     private IExerciseRepository? _exercises;
     private IWorkoutSessionRepository? _workoutSessions;
 
-    public UnitOfWork(WorkoutDbContext context)
-    {
+    public UnitOfWork(WorkoutDbContext context) {
         _context = context;
     }
 
@@ -23,18 +21,15 @@ public class UnitOfWork : IUnitOfWork
     public IExerciseRepository Exercises => _exercises ??= new ExerciseRepository(_context);
     public IWorkoutSessionRepository WorkoutSessions => _workoutSessions ??= new WorkoutSessionRepository(_context);
 
-    public async Task<int> SaveChangesAsync()
-    {
+    public async Task<int> SaveChangesAsync() {
         return await _context.SaveChangesAsync();
     }
 
-    public async Task BeginTransactionAsync()
-    {
+    public async Task BeginTransactionAsync() {
         _transaction = await _context.Database.BeginTransactionAsync();
     }
 
-    public async Task CommitTransactionAsync()
-    {
+    public async Task CommitTransactionAsync() {
         if (_transaction != null)
         {
             await _transaction.CommitAsync();
@@ -43,8 +38,7 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    public async Task RollbackTransactionAsync()
-    {
+    public async Task RollbackTransactionAsync() {
         if (_transaction != null)
         {
             await _transaction.RollbackAsync();
@@ -53,8 +47,7 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         _transaction?.Dispose();
         _context.Dispose();
     }

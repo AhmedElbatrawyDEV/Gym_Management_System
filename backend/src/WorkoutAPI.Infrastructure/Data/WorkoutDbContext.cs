@@ -1,16 +1,12 @@
 // Infrastructure/Data/WorkoutDbContext.cs
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
-using System.Text.Json;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 
-namespace WorkoutAPI.Infrastructure.Data
-{
-    public class WorkoutDbContext : DbContext
-    {
-        public WorkoutDbContext(DbContextOptions<WorkoutDbContext> options) : base(options)
-        {
+namespace WorkoutAPI.Infrastructure.Data {
+    public class WorkoutDbContext : DbContext {
+        public WorkoutDbContext(DbContextOptions<WorkoutDbContext> options) : base(options) {
         }
 
         // Existing entities
@@ -34,8 +30,7 @@ namespace WorkoutAPI.Infrastructure.Data
         public DbSet<ClassSchedule> ClassSchedules { get; set; }
         public DbSet<ClassBooking> ClassBookings { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
             base.OnModelCreating(modelBuilder);
 
             // Configure existing entities
@@ -54,10 +49,8 @@ namespace WorkoutAPI.Infrastructure.Data
             SeedDefaultData(modelBuilder);
         }
 
-        private static void ConfigureUserEntity(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<User>(entity =>
-            {
+        private static void ConfigureUserEntity(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<User>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Email).IsUnique();
                 entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
@@ -72,10 +65,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigureAdminEntity(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Admin>(entity =>
-            {
+        private static void ConfigureAdminEntity(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<Admin>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Email).IsUnique();
                 entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
@@ -88,10 +79,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigureSubscriptionEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<SubscriptionPlan>(entity =>
-            {
+        private static void ConfigureSubscriptionEntities(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<SubscriptionPlan>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Description).HasMaxLength(1000);
@@ -107,8 +96,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     .HasColumnType("nvarchar(max)");
             });
 
-            modelBuilder.Entity<UserSubscription>(entity =>
-            {
+            modelBuilder.Entity<UserSubscription>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Status).HasConversion<int>();
                 entity.Property(e => e.AutoRenew).HasDefaultValue(false);
@@ -125,10 +113,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigurePaymentEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Payment>(entity =>
-            {
+        private static void ConfigurePaymentEntities(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<Payment>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
                 entity.Property(e => e.Currency).IsRequired().HasMaxLength(3).HasDefaultValue("SAR");
@@ -156,8 +142,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<Invoice>(entity =>
-            {
+            modelBuilder.Entity<Invoice>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.InvoiceNumber).IsUnique();
                 entity.Property(e => e.InvoiceNumber).IsRequired().HasMaxLength(50);
@@ -178,10 +163,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigureAttendanceEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<AttendanceRecord>(entity =>
-            {
+        private static void ConfigureAttendanceEntities(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<AttendanceRecord>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ActivityType).HasConversion<int>();
                 entity.Property(e => e.CheckInTime).IsRequired();
@@ -195,10 +178,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigureGymClassEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<GymClass>(entity =>
-            {
+        private static void ConfigureGymClassEntities(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<GymClass>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.Description).HasMaxLength(1000);
@@ -213,8 +194,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     .OnDelete(DeleteBehavior.SetNull);
             });
 
-            modelBuilder.Entity<ClassSchedule>(entity =>
-            {
+            modelBuilder.Entity<ClassSchedule>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StartTime).IsRequired();
                 entity.Property(e => e.EndTime).IsRequired();
@@ -228,8 +208,7 @@ namespace WorkoutAPI.Infrastructure.Data
                 entity.HasIndex(e => new { e.GymClassId, e.StartTime });
             });
 
-            modelBuilder.Entity<ClassBooking>(entity =>
-            {
+            modelBuilder.Entity<ClassBooking>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.BookingDate).IsRequired();
                 entity.Property(e => e.Status).HasConversion<int>();
@@ -248,10 +227,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigureExerciseEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Exercise>(entity =>
-            {
+        private static void ConfigureExerciseEntities(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<Exercise>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Code).IsUnique();
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
@@ -263,8 +240,7 @@ namespace WorkoutAPI.Infrastructure.Data
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
-            modelBuilder.Entity<ExerciseTranslation>(entity =>
-            {
+            modelBuilder.Entity<ExerciseTranslation>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Language).IsRequired().HasMaxLength(10);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
@@ -280,10 +256,8 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void ConfigureWorkoutEntities(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<WorkoutPlan>(entity =>
-            {
+        private static void ConfigureWorkoutEntities(ModelBuilder modelBuilder) {
+            modelBuilder.Entity<WorkoutPlan>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Code).IsUnique();
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
@@ -293,8 +267,7 @@ namespace WorkoutAPI.Infrastructure.Data
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
             });
 
-            modelBuilder.Entity<WorkoutPlanTranslation>(entity =>
-            {
+            modelBuilder.Entity<WorkoutPlanTranslation>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Language).IsRequired().HasMaxLength(10);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
@@ -308,8 +281,7 @@ namespace WorkoutAPI.Infrastructure.Data
                 entity.HasIndex(e => new { e.WorkoutPlanId, e.Language }).IsUnique();
             });
 
-            modelBuilder.Entity<WorkoutPlanExercise>(entity =>
-            {
+            modelBuilder.Entity<WorkoutPlanExercise>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Order).IsRequired();
                 entity.Property(e => e.Sets).IsRequired();
@@ -331,8 +303,7 @@ namespace WorkoutAPI.Infrastructure.Data
                 entity.HasIndex(e => new { e.WorkoutPlanId, e.Order }).IsUnique();
             });
 
-            modelBuilder.Entity<WorkoutSession>(entity =>
-            {
+            modelBuilder.Entity<WorkoutSession>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.StartTime).IsRequired();
                 entity.Property(e => e.Status).HasConversion<int>();
@@ -351,8 +322,7 @@ namespace WorkoutAPI.Infrastructure.Data
                 entity.HasIndex(e => new { e.UserId, e.StartTime });
             });
 
-            modelBuilder.Entity<WorkoutSessionExercise>(entity =>
-            {
+            modelBuilder.Entity<WorkoutSessionExercise>(entity => {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Order).IsRequired();
                 entity.Property(e => e.Notes).HasMaxLength(500);
@@ -368,8 +338,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 // Configure ExerciseSetRecord as owned entity type
-                entity.OwnsMany(e => e.Sets, setBuilder =>
-                {
+                entity.OwnsMany(e => e.Sets, setBuilder => {
                     setBuilder.Property(s => s.SetNumber).IsRequired();
                     setBuilder.Property(s => s.Reps).IsRequired();
                     setBuilder.Property(s => s.Weight).HasColumnType("decimal(10,2)");
@@ -380,12 +349,10 @@ namespace WorkoutAPI.Infrastructure.Data
             });
         }
 
-        private static void SeedDefaultData(ModelBuilder modelBuilder)
-        {
+        private static void SeedDefaultData(ModelBuilder modelBuilder) {
             // Seed default admin
             var adminId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-            modelBuilder.Entity<Admin>().HasData(new Admin
-            {
+            modelBuilder.Entity<Admin>().HasData(new Admin {
                 Id = adminId,
                 FirstName = "System",
                 LastName = "Administrator",
@@ -403,8 +370,7 @@ namespace WorkoutAPI.Infrastructure.Data
             var premiumPlanId = Guid.Parse("44444444-4444-4444-4444-444444444444");
 
             modelBuilder.Entity<SubscriptionPlan>().HasData(
-                new SubscriptionPlan
-                {
+                new SubscriptionPlan {
                     Id = basicPlanId,
                     Name = "Basic Plan",
                     Description = "Access to gym equipment during regular hours",
@@ -415,8 +381,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                new SubscriptionPlan
-                {
+                new SubscriptionPlan {
                     Id = standardPlanId,
                     Name = "Standard Plan",
                     Description = "Full gym access with group classes",
@@ -427,8 +392,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                new SubscriptionPlan
-                {
+                new SubscriptionPlan {
                     Id = premiumPlanId,
                     Name = "Premium Plan",
                     Description = "All-inclusive membership with personal training",
@@ -446,8 +410,7 @@ namespace WorkoutAPI.Infrastructure.Data
             var crossfitClassId = Guid.Parse("66666666-6666-6666-6666-666666666666");
 
             modelBuilder.Entity<GymClass>().HasData(
-                new GymClass
-                {
+                new GymClass {
                     Id = yogaClassId,
                     Name = "Morning Yoga",
                     Description = "Relaxing yoga session to start your day",
@@ -458,8 +421,7 @@ namespace WorkoutAPI.Infrastructure.Data
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
-                new GymClass
-                {
+                new GymClass {
                     Id = crossfitClassId,
                     Name = "CrossFit Challenge",
                     Description = "High-intensity functional fitness workout",

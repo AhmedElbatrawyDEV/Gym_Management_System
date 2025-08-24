@@ -6,8 +6,7 @@ using WorkoutAPI.Domain.Interfaces;
 
 namespace WorkoutAPI.Application.Services;
 
-public interface IUserService
-{
+public interface IUserService {
     Task<UserResponse> CreateUserAsync(CreateUserRequest request);
     Task<UserResponse> UpdateUserAsync(Guid userId, UpdateUserRequest request);
     Task<UserResponse?> GetUserByIdAsync(Guid userId);
@@ -18,19 +17,16 @@ public interface IUserService
     Task<bool> UserExistsAsync(string email);
 }
 
-public class UserService : IUserService
-{
+public class UserService : IUserService {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UserService> _logger;
 
-    public UserService(IUnitOfWork unitOfWork, ILogger<UserService> logger)
-    {
+    public UserService(IUnitOfWork unitOfWork, ILogger<UserService> logger) {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
-    public async Task<UserResponse> CreateUserAsync(CreateUserRequest request)
-    {
+    public async Task<UserResponse> CreateUserAsync(CreateUserRequest request) {
         _logger.LogInformation("Creating new user with email: {Email}", request.Email);
 
         // Check if user already exists
@@ -59,8 +55,7 @@ public class UserService : IUserService
         return user.Adapt<UserResponse>();
     }
 
-    public async Task<UserResponse> UpdateUserAsync(Guid userId, UpdateUserRequest request)
-    {
+    public async Task<UserResponse> UpdateUserAsync(Guid userId, UpdateUserRequest request) {
         _logger.LogInformation("Updating user with ID: {UserId}", userId);
 
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
@@ -96,20 +91,17 @@ public class UserService : IUserService
         return user.Adapt<UserResponse>();
     }
 
-    public async Task<UserResponse?> GetUserByIdAsync(Guid userId)
-    {
+    public async Task<UserResponse?> GetUserByIdAsync(Guid userId) {
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
         return user?.Adapt<UserResponse>();
     }
 
-    public async Task<UserResponse?> GetUserByEmailAsync(string email)
-    {
+    public async Task<UserResponse?> GetUserByEmailAsync(string email) {
         var user = await _unitOfWork.Users.GetByEmailAsync(email);
         return user?.Adapt<UserResponse>();
     }
 
-    public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId)
-    {
+    public async Task<UserProfileResponse?> GetUserProfileAsync(Guid userId) {
         var user = await _unitOfWork.Users.GetUserWithWorkoutPlansAsync(userId);
         if (user == null) return null;
 
@@ -122,14 +114,12 @@ public class UserService : IUserService
         return user.Adapt<UserProfileResponse>();
     }
 
-    public async Task<IEnumerable<UserResponse>> GetActiveUsersAsync()
-    {
+    public async Task<IEnumerable<UserResponse>> GetActiveUsersAsync() {
         var users = await _unitOfWork.Users.GetActiveUsersAsync();
         return users.Adapt<IEnumerable<UserResponse>>();
     }
 
-    public async Task<bool> DeleteUserAsync(Guid userId)
-    {
+    public async Task<bool> DeleteUserAsync(Guid userId) {
         _logger.LogInformation("Deleting user with ID: {UserId}", userId);
 
         var user = await _unitOfWork.Users.GetByIdAsync(userId);
@@ -150,8 +140,7 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<bool> UserExistsAsync(string email)
-    {
+    public async Task<bool> UserExistsAsync(string email) {
         return await _unitOfWork.Users.ExistsAsync(u => u.Email == email && u.IsActive);
     }
 }

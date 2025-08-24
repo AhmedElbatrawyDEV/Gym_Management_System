@@ -7,8 +7,7 @@ namespace WorkoutAPI.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : ControllerBase
-{
+public class UsersController : ControllerBase {
     private readonly IUserService _userService;
     private readonly IValidator<CreateUserRequest> _createUserValidator;
     private readonly IValidator<UpdateUserRequest> _updateUserValidator;
@@ -18,8 +17,7 @@ public class UsersController : ControllerBase
         IUserService userService,
         IValidator<CreateUserRequest> createUserValidator,
         IValidator<UpdateUserRequest> updateUserValidator,
-        ILogger<UsersController> logger)
-    {
+        ILogger<UsersController> logger) {
         _userService = userService;
         _createUserValidator = createUserValidator;
         _updateUserValidator = updateUserValidator;
@@ -30,14 +28,12 @@ public class UsersController : ControllerBase
     /// Get all active users
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers()
-    {
+    public async Task<ActionResult<IEnumerable<UserResponse>>> GetUsers() {
         try
         {
             var users = await _userService.GetActiveUsersAsync();
             return Ok(users);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting users");
             return StatusCode(500, "An error occurred while processing your request");
@@ -48,8 +44,7 @@ public class UsersController : ControllerBase
     /// Get user by ID
     /// </summary>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<UserResponse>> GetUser(Guid id)
-    {
+    public async Task<ActionResult<UserResponse>> GetUser(Guid id) {
         try
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -59,8 +54,7 @@ public class UsersController : ControllerBase
             }
 
             return Ok(user);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting user {UserId}", id);
             return StatusCode(500, "An error occurred while processing your request");
@@ -71,8 +65,7 @@ public class UsersController : ControllerBase
     /// Get user profile with workout plans and recent sessions
     /// </summary>
     [HttpGet("{id:guid}/profile")]
-    public async Task<ActionResult<UserProfileResponse>> GetUserProfile(Guid id)
-    {
+    public async Task<ActionResult<UserProfileResponse>> GetUserProfile(Guid id) {
         try
         {
             var userProfile = await _userService.GetUserProfileAsync(id);
@@ -82,8 +75,7 @@ public class UsersController : ControllerBase
             }
 
             return Ok(userProfile);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting user profile {UserId}", id);
             return StatusCode(500, "An error occurred while processing your request");
@@ -94,8 +86,7 @@ public class UsersController : ControllerBase
     /// Get user by email
     /// </summary>
     [HttpGet("by-email/{email}")]
-    public async Task<ActionResult<UserResponse>> GetUserByEmail(string email)
-    {
+    public async Task<ActionResult<UserResponse>> GetUserByEmail(string email) {
         try
         {
             var user = await _userService.GetUserByEmailAsync(email);
@@ -105,8 +96,7 @@ public class UsersController : ControllerBase
             }
 
             return Ok(user);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting user by email {Email}", email);
             return StatusCode(500, "An error occurred while processing your request");
@@ -117,8 +107,7 @@ public class UsersController : ControllerBase
     /// Create a new user
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<UserResponse>> CreateUser([FromBody] CreateUserRequest request)
-    {
+    public async Task<ActionResult<UserResponse>> CreateUser([FromBody] CreateUserRequest request) {
         try
         {
             // Validate request
@@ -130,13 +119,11 @@ public class UsersController : ControllerBase
 
             var user = await _userService.CreateUserAsync(request);
             return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-        }
-        catch (InvalidOperationException ex)
+        } catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "Invalid operation while creating user");
             return Conflict(ex.Message);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while creating user");
             return StatusCode(500, "An error occurred while processing your request");
@@ -147,8 +134,7 @@ public class UsersController : ControllerBase
     /// Update an existing user
     /// </summary>
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<UserResponse>> UpdateUser(Guid id, [FromBody] UpdateUserRequest request)
-    {
+    public async Task<ActionResult<UserResponse>> UpdateUser(Guid id, [FromBody] UpdateUserRequest request) {
         try
         {
             // Validate request
@@ -160,18 +146,15 @@ public class UsersController : ControllerBase
 
             var user = await _userService.UpdateUserAsync(id, request);
             return Ok(user);
-        }
-        catch (ArgumentException ex)
+        } catch (ArgumentException ex)
         {
             _logger.LogWarning(ex, "User not found for update: {UserId}", id);
             return NotFound(ex.Message);
-        }
-        catch (InvalidOperationException ex)
+        } catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "Invalid operation while updating user");
             return Conflict(ex.Message);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while updating user {UserId}", id);
             return StatusCode(500, "An error occurred while processing your request");
@@ -182,8 +165,7 @@ public class UsersController : ControllerBase
     /// Delete a user (soft delete)
     /// </summary>
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> DeleteUser(Guid id)
-    {
+    public async Task<ActionResult> DeleteUser(Guid id) {
         try
         {
             var result = await _userService.DeleteUserAsync(id);
@@ -193,8 +175,7 @@ public class UsersController : ControllerBase
             }
 
             return NoContent();
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while deleting user {UserId}", id);
             return StatusCode(500, "An error occurred while processing your request");
@@ -205,14 +186,12 @@ public class UsersController : ControllerBase
     /// Check if user exists by email
     /// </summary>
     [HttpGet("exists/{email}")]
-    public async Task<ActionResult<bool>> UserExists(string email)
-    {
+    public async Task<ActionResult<bool>> UserExists(string email) {
         try
         {
             var exists = await _userService.UserExistsAsync(email);
             return Ok(exists);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while checking user existence for email {Email}", email);
             return StatusCode(500, "An error occurred while processing your request");

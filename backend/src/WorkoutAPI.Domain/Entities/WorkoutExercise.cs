@@ -1,7 +1,6 @@
 using WorkoutAPI.Domain.Common;
 namespace WorkoutAPI.Domain.Entities;
-public class WorkoutExercise : BaseEntity
-{
+public class WorkoutExercise : BaseEntity {
     public Guid WorkoutPlanId { get; set; }
     public WorkoutPlan WorkoutPlan { get; set; } = default!;
     public Guid ExerciseId { get; set; }

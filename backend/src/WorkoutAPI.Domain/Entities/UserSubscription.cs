@@ -1,10 +1,8 @@
 ﻿using WorkoutAPI.Domain.Common;
 
 
-namespace WorkoutAPI.Domain.Entities
-{
-    public class UserSubscription : BaseEntity
-    {
+namespace WorkoutAPI.Domain.Entities {
+    public class UserSubscription : BaseEntity {
         public Guid UserId { get; set; }
         public Guid SubscriptionPlanId { get; set; }
         public DateTime StartDate { get; set; }

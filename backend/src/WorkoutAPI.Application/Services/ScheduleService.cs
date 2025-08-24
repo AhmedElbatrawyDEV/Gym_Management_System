@@ -6,8 +6,7 @@ using WorkoutAPI.Domain.Interfaces;
 
 namespace WorkoutAPI.Application.Services;
 
-public interface IScheduleService
-{
+public interface IScheduleService {
     Task<ScheduleResponse> CreateScheduleAsync(CreateScheduleRequest request);
     Task<ScheduleResponse> UpdateScheduleAsync(Guid scheduleId, UpdateScheduleRequest request);
     Task<ScheduleResponse?> GetScheduleByIdAsync(Guid scheduleId);
@@ -19,19 +18,16 @@ public interface IScheduleService
     Task<bool> UnenrollFromScheduleAsync(Guid scheduleId);
 }
 
-public class ScheduleService : IScheduleService
-{
+public class ScheduleService : IScheduleService {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<ScheduleService> _logger;
 
-    public ScheduleService(IUnitOfWork unitOfWork, ILogger<ScheduleService> logger)
-    {
+    public ScheduleService(IUnitOfWork unitOfWork, ILogger<ScheduleService> logger) {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
-    public async Task<ScheduleResponse> CreateScheduleAsync(CreateScheduleRequest request)
-    {
+    public async Task<ScheduleResponse> CreateScheduleAsync(CreateScheduleRequest request) {
         _logger.LogInformation("Creating new schedule: {Title}", request.Title);
 
         // Validate trainer if provided
@@ -64,8 +60,7 @@ public class ScheduleService : IScheduleService
         return result!;
     }
 
-    public async Task<ScheduleResponse> UpdateScheduleAsync(Guid scheduleId, UpdateScheduleRequest request)
-    {
+    public async Task<ScheduleResponse> UpdateScheduleAsync(Guid scheduleId, UpdateScheduleRequest request) {
         _logger.LogInformation("Updating schedule with ID: {ScheduleId}", scheduleId);
 
         var schedule = await _unitOfWork.Schedules.GetByIdAsync(scheduleId);
@@ -113,8 +108,7 @@ public class ScheduleService : IScheduleService
         return result!;
     }
 
-    public async Task<ScheduleResponse?> GetScheduleByIdAsync(Guid scheduleId)
-    {
+    public async Task<ScheduleResponse?> GetScheduleByIdAsync(Guid scheduleId) {
         var schedule = await _unitOfWork.Schedules.GetScheduleWithDetailsAsync(scheduleId);
         if (schedule == null) return null;
 
@@ -134,8 +128,7 @@ public class ScheduleService : IScheduleService
         );
     }
 
-    public async Task<IEnumerable<ScheduleResponse>> GetSchedulesByTrainerIdAsync(Guid trainerId)
-    {
+    public async Task<IEnumerable<ScheduleResponse>> GetSchedulesByTrainerIdAsync(Guid trainerId) {
         var schedules = await _unitOfWork.Schedules.GetSchedulesByTrainerIdAsync(trainerId);
         return schedules.Select(s => new ScheduleResponse(
             s.Id,
@@ -153,8 +146,7 @@ public class ScheduleService : IScheduleService
         ));
     }
 
-    public async Task<IEnumerable<ScheduleResponse>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate)
-    {
+    public async Task<IEnumerable<ScheduleResponse>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate) {
         var schedules = await _unitOfWork.Schedules.GetSchedulesByDateRangeAsync(startDate, endDate);
         return schedules.Select(s => new ScheduleResponse(
             s.Id,
@@ -172,8 +164,7 @@ public class ScheduleService : IScheduleService
         ));
     }
 
-    public async Task<IEnumerable<ScheduleResponse>> GetAvailableSchedulesAsync()
-    {
+    public async Task<IEnumerable<ScheduleResponse>> GetAvailableSchedulesAsync() {
         var schedules = await _unitOfWork.Schedules.GetAvailableSchedulesAsync();
         return schedules.Select(s => new ScheduleResponse(
             s.Id,
@@ -191,8 +182,7 @@ public class ScheduleService : IScheduleService
         ));
     }
 
-    public async Task<bool> DeleteScheduleAsync(Guid scheduleId)
-    {
+    public async Task<bool> DeleteScheduleAsync(Guid scheduleId) {
         _logger.LogInformation("Deleting schedule with ID: {ScheduleId}", scheduleId);
 
         var schedule = await _unitOfWork.Schedules.GetByIdAsync(scheduleId);
@@ -209,8 +199,7 @@ public class ScheduleService : IScheduleService
         return true;
     }
 
-    public async Task<bool> EnrollInScheduleAsync(Guid scheduleId)
-    {
+    public async Task<bool> EnrollInScheduleAsync(Guid scheduleId) {
         var schedule = await _unitOfWork.Schedules.GetByIdAsync(scheduleId);
         if (schedule == null || schedule.EnrolledCount >= schedule.Capacity)
         {
@@ -226,8 +215,7 @@ public class ScheduleService : IScheduleService
         return true;
     }
 
-    public async Task<bool> UnenrollFromScheduleAsync(Guid scheduleId)
-    {
+    public async Task<bool> UnenrollFromScheduleAsync(Guid scheduleId) {
         var schedule = await _unitOfWork.Schedules.GetByIdAsync(scheduleId);
         if (schedule == null || schedule.EnrolledCount <= 0)
         {

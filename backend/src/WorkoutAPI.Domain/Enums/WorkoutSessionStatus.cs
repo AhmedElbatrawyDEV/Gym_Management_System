@@ -1,7 +1,6 @@
 namespace WorkoutAPI.Domain.Enums;
 
-public enum WorkoutSessionStatus
-{
+public enum WorkoutSessionStatus {
     NotStarted = 1,
     InProgress = 2,
     Completed = 3,

@@ -1,7 +1,6 @@
 namespace WorkoutAPI.Domain.Enums;
 
-public enum MuscleGroup
-{
+public enum MuscleGroup {
     Chest = 1,
     Shoulders = 2,
     Triceps = 3,

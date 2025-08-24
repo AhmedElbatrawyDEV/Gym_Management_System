@@ -6,8 +6,7 @@ using WorkoutAPI.Domain.Interfaces;
 
 namespace WorkoutAPI.Application.Services;
 
-public interface ITrainerService
-{
+public interface ITrainerService {
     Task<TrainerResponse> CreateTrainerAsync(CreateTrainerRequest request);
     Task<TrainerResponse> UpdateTrainerAsync(Guid trainerId, UpdateTrainerRequest request);
     Task<TrainerResponse?> GetTrainerByIdAsync(Guid trainerId);
@@ -17,19 +16,16 @@ public interface ITrainerService
     Task<bool> DeleteTrainerAsync(Guid trainerId);
 }
 
-public class TrainerService : ITrainerService
-{
+public class TrainerService : ITrainerService {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<TrainerService> _logger;
 
-    public TrainerService(IUnitOfWork unitOfWork, ILogger<TrainerService> logger)
-    {
+    public TrainerService(IUnitOfWork unitOfWork, ILogger<TrainerService> logger) {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
-    public async Task<TrainerResponse> CreateTrainerAsync(CreateTrainerRequest request)
-    {
+    public async Task<TrainerResponse> CreateTrainerAsync(CreateTrainerRequest request) {
         _logger.LogInformation("Creating new trainer for user ID: {UserId}", request.UserId);
 
         // Check if user exists
@@ -56,8 +52,7 @@ public class TrainerService : ITrainerService
         return result!;
     }
 
-    public async Task<TrainerResponse> UpdateTrainerAsync(Guid trainerId, UpdateTrainerRequest request)
-    {
+    public async Task<TrainerResponse> UpdateTrainerAsync(Guid trainerId, UpdateTrainerRequest request) {
         _logger.LogInformation("Updating trainer with ID: {TrainerId}", trainerId);
 
         var trainer = await _unitOfWork.Trainers.GetByIdAsync(trainerId);
@@ -81,8 +76,7 @@ public class TrainerService : ITrainerService
         return result!;
     }
 
-    public async Task<TrainerResponse?> GetTrainerByIdAsync(Guid trainerId)
-    {
+    public async Task<TrainerResponse?> GetTrainerByIdAsync(Guid trainerId) {
         var trainer = await _unitOfWork.Trainers.GetByIdAsync(trainerId);
         if (trainer == null) return null;
 
@@ -100,8 +94,7 @@ public class TrainerService : ITrainerService
         );
     }
 
-    public async Task<TrainerResponse?> GetTrainerByUserIdAsync(Guid userId)
-    {
+    public async Task<TrainerResponse?> GetTrainerByUserIdAsync(Guid userId) {
         var trainer = await _unitOfWork.Trainers.GetByUserIdAsync(userId);
         if (trainer == null) return null;
 
@@ -119,8 +112,7 @@ public class TrainerService : ITrainerService
         );
     }
 
-    public async Task<IEnumerable<TrainerResponse>> GetAvailableTrainersAsync()
-    {
+    public async Task<IEnumerable<TrainerResponse>> GetAvailableTrainersAsync() {
         var trainers = await _unitOfWork.Trainers.GetAvailableTrainersAsync();
         return trainers.Select(t => new TrainerResponse(
             t.Id,
@@ -136,8 +128,7 @@ public class TrainerService : ITrainerService
         ));
     }
 
-    public async Task<IEnumerable<TrainerResponse>> GetTrainersBySpecializationAsync(string specialization)
-    {
+    public async Task<IEnumerable<TrainerResponse>> GetTrainersBySpecializationAsync(string specialization) {
         var trainers = await _unitOfWork.Trainers.GetTrainersBySpecializationAsync(specialization);
         return trainers.Select(t => new TrainerResponse(
             t.Id,
@@ -153,8 +144,7 @@ public class TrainerService : ITrainerService
         ));
     }
 
-    public async Task<bool> DeleteTrainerAsync(Guid trainerId)
-    {
+    public async Task<bool> DeleteTrainerAsync(Guid trainerId) {
         _logger.LogInformation("Deleting trainer with ID: {TrainerId}", trainerId);
 
         var trainer = await _unitOfWork.Trainers.GetByIdAsync(trainerId);

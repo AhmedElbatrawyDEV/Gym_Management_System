@@ -7,8 +7,7 @@ using WorkoutAPI.Domain.Interfaces;
 
 namespace WorkoutAPI.Application.Services;
 
-public interface IMemberService
-{
+public interface IMemberService {
     Task<MemberResponse> CreateMemberAsync(CreateMemberRequest request);
     Task<MemberResponse> UpdateMemberAsync(Guid memberId, UpdateMemberRequest request);
     Task<MemberResponse?> GetMemberByIdAsync(Guid memberId);
@@ -19,19 +18,16 @@ public interface IMemberService
     Task<bool> DeleteMemberAsync(Guid memberId);
 }
 
-public class MemberService : IMemberService
-{
+public class MemberService : IMemberService {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<MemberService> _logger;
 
-    public MemberService(IUnitOfWork unitOfWork, ILogger<MemberService> logger)
-    {
+    public MemberService(IUnitOfWork unitOfWork, ILogger<MemberService> logger) {
         _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
-    public async Task<MemberResponse> CreateMemberAsync(CreateMemberRequest request)
-    {
+    public async Task<MemberResponse> CreateMemberAsync(CreateMemberRequest request) {
         _logger.LogInformation("Creating new member for user ID: {UserId}", request.UserId);
 
         // Check if user exists
@@ -58,8 +54,7 @@ public class MemberService : IMemberService
         return result!;
     }
 
-    public async Task<MemberResponse> UpdateMemberAsync(Guid memberId, UpdateMemberRequest request)
-    {
+    public async Task<MemberResponse> UpdateMemberAsync(Guid memberId, UpdateMemberRequest request) {
         _logger.LogInformation("Updating member with ID: {MemberId}", memberId);
 
         var member = await _unitOfWork.Members.GetByIdAsync(memberId);
@@ -83,8 +78,7 @@ public class MemberService : IMemberService
         return result!;
     }
 
-    public async Task<MemberResponse?> GetMemberByIdAsync(Guid memberId)
-    {
+    public async Task<MemberResponse?> GetMemberByIdAsync(Guid memberId) {
         var member = await _unitOfWork.Members.GetByIdAsync(memberId);
         if (member == null) return null;
 
@@ -102,8 +96,7 @@ public class MemberService : IMemberService
         );
     }
 
-    public async Task<MemberResponse?> GetMemberByUserIdAsync(Guid userId)
-    {
+    public async Task<MemberResponse?> GetMemberByUserIdAsync(Guid userId) {
         var member = await _unitOfWork.Members.GetByUserIdAsync(userId);
         if (member == null) return null;
 
@@ -121,8 +114,7 @@ public class MemberService : IMemberService
         );
     }
 
-    public async Task<IEnumerable<MemberResponse>> GetActiveMembersAsync()
-    {
+    public async Task<IEnumerable<MemberResponse>> GetActiveMembersAsync() {
         var members = await _unitOfWork.Members.GetActiveMembersAsync();
         return members.Select(m => new MemberResponse(
             m.Id,
@@ -138,8 +130,7 @@ public class MemberService : IMemberService
         ));
     }
 
-    public async Task<IEnumerable<MemberResponse>> GetMembersByMembershipTypeAsync(MembershipType membershipType)
-    {
+    public async Task<IEnumerable<MemberResponse>> GetMembersByMembershipTypeAsync(MembershipType membershipType) {
         var members = await _unitOfWork.Members.GetMembersByMembershipTypeAsync(membershipType);
         return members.Select(m => new MemberResponse(
             m.Id,
@@ -155,8 +146,7 @@ public class MemberService : IMemberService
         ));
     }
 
-    public async Task<IEnumerable<MemberResponse>> GetExpiringMembershipsAsync(int daysFromNow)
-    {
+    public async Task<IEnumerable<MemberResponse>> GetExpiringMembershipsAsync(int daysFromNow) {
         var expirationDate = DateTime.UtcNow.AddDays(daysFromNow);
         var members = await _unitOfWork.Members.GetExpiringMembershipsAsync(expirationDate);
         return members.Select(m => new MemberResponse(
@@ -173,8 +163,7 @@ public class MemberService : IMemberService
         ));
     }
 
-    public async Task<bool> DeleteMemberAsync(Guid memberId)
-    {
+    public async Task<bool> DeleteMemberAsync(Guid memberId) {
         _logger.LogInformation("Deleting member with ID: {MemberId}", memberId);
 
         var member = await _unitOfWork.Members.GetByIdAsync(memberId);

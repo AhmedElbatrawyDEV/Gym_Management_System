@@ -1,18 +1,12 @@
 // Services/IAdminService.cs
-using System.Security.Claims;
-using System.Text;
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Application.DTOs.WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 
-namespace WorkoutAPI.Application.Services
-{
+namespace WorkoutAPI.Application.Services {
 
 
-    public interface IAttendanceService
-    {
+    public interface IAttendanceService {
         Task<AttendanceRecordResponse> CheckInAsync(Guid userId, ActivityType activityType);
         Task<AttendanceRecordResponse> CheckOutAsync(Guid recordId);
         Task<IEnumerable<AttendanceRecordResponse>> GetUserAttendanceAsync(Guid userId, DateTime? fromDate, DateTime? toDate);
@@ -21,17 +15,14 @@ namespace WorkoutAPI.Application.Services
         Task<ClassBookingResponse> BookClassAsync(Guid userId, Guid scheduleId);
         Task CancelBookingAsync(Guid bookingId);
     }
-    public class AttendanceService : IAttendanceService
-    {
+    public class AttendanceService : IAttendanceService {
         private readonly WorkoutDbContext _context;
 
-        public AttendanceService(WorkoutDbContext context)
-        {
+        public AttendanceService(WorkoutDbContext context) {
             _context = context;
         }
 
-        public async Task<AttendanceRecordResponse> CheckInAsync(Guid userId, ActivityType activityType)
-        {
+        public async Task<AttendanceRecordResponse> CheckInAsync(Guid userId, ActivityType activityType) {
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -45,8 +36,7 @@ namespace WorkoutAPI.Application.Services
             if (existingRecord != null)
                 throw new InvalidOperationException("User is already checked in");
 
-            var record = new AttendanceRecord
-            {
+            var record = new AttendanceRecord {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 CheckInTime = DateTime.UtcNow,
@@ -60,8 +50,7 @@ namespace WorkoutAPI.Application.Services
             return MapAttendanceToResponse(record);
         }
 
-        public async Task<AttendanceRecordResponse> CheckOutAsync(Guid recordId)
-        {
+        public async Task<AttendanceRecordResponse> CheckOutAsync(Guid recordId) {
             var record = await _context.AttendanceRecords
                 .FirstOrDefaultAsync(a => a.Id == recordId);
 
@@ -76,8 +65,7 @@ namespace WorkoutAPI.Application.Services
             return MapAttendanceToResponse(record);
         }
 
-        public async Task<IEnumerable<AttendanceRecordResponse>> GetUserAttendanceAsync(Guid userId, DateTime? fromDate, DateTime? toDate)
-        {
+        public async Task<IEnumerable<AttendanceRecordResponse>> GetUserAttendanceAsync(Guid userId, DateTime? fromDate, DateTime? toDate) {
             var query = _context.AttendanceRecords
                 .Where(a => a.UserId == userId);
 
@@ -94,8 +82,7 @@ namespace WorkoutAPI.Application.Services
             return records.Select(MapAttendanceToResponse);
         }
 
-        public async Task<IEnumerable<GymClassResponse>> GetGymClassesAsync()
-        {
+        public async Task<IEnumerable<GymClassResponse>> GetGymClassesAsync() {
             var classes = await _context.GymClasses
                 .Include(c => c.Instructor)
                 .Include(c => c.Schedules)
@@ -106,10 +93,8 @@ namespace WorkoutAPI.Application.Services
             return classes.Select(MapClassToResponse);
         }
 
-        public async Task<GymClassResponse> CreateGymClassAsync(CreateGymClassRequest request)
-        {
-            var gymClass = new GymClass
-            {
+        public async Task<GymClassResponse> CreateGymClassAsync(CreateGymClassRequest request) {
+            var gymClass = new GymClass {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
                 Description = request.Description,
@@ -132,8 +117,7 @@ namespace WorkoutAPI.Application.Services
             return MapClassToResponse(gymClass);
         }
 
-        public async Task<ClassBookingResponse> BookClassAsync(Guid userId, Guid scheduleId)
-        {
+        public async Task<ClassBookingResponse> BookClassAsync(Guid userId, Guid scheduleId) {
             var schedule = await _context.ClassSchedules
                 .Include(s => s.GymClass)
                 .Include(s => s.Bookings)
@@ -152,8 +136,7 @@ namespace WorkoutAPI.Application.Services
             if (existingBooking != null)
                 throw new InvalidOperationException("User already booked this class");
 
-            var booking = new ClassBooking
-            {
+            var booking = new ClassBooking {
                 Id = Guid.NewGuid(),
                 UserId = userId,
                 ClassScheduleId = scheduleId,
@@ -174,8 +157,7 @@ namespace WorkoutAPI.Application.Services
             );
         }
 
-        public async Task CancelBookingAsync(Guid bookingId)
-        {
+        public async Task CancelBookingAsync(Guid bookingId) {
             var booking = await _context.ClassBookings
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
 
@@ -188,8 +170,7 @@ namespace WorkoutAPI.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        private static AttendanceRecordResponse MapAttendanceToResponse(AttendanceRecord record)
-        {
+        private static AttendanceRecordResponse MapAttendanceToResponse(AttendanceRecord record) {
             return new AttendanceRecordResponse(
                 Id: record.Id,
                 UserId: record.UserId,
@@ -200,8 +181,7 @@ namespace WorkoutAPI.Application.Services
             );
         }
 
-        private static GymClassResponse MapClassToResponse(GymClass gymClass)
-        {
+        private static GymClassResponse MapClassToResponse(GymClass gymClass) {
             return new GymClassResponse(
                 Id: gymClass.Id,
                 Name: gymClass.Name,

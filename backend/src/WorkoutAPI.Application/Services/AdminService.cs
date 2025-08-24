@@ -2,12 +2,9 @@
 using System.Security.Claims;
 using System.Text;
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 
-namespace WorkoutAPI.Application.Services
-{
-    public interface IAdminService
-    {
+namespace WorkoutAPI.Application.Services {
+    public interface IAdminService {
         Task<AdminResponse> CreateAdminAsync(CreateAdminRequest request);
         Task<LoginResponse> LoginAsync(string email, string password);
         Task<IEnumerable<AdminResponse>> GetAllAdminsAsync();
@@ -16,19 +13,16 @@ namespace WorkoutAPI.Application.Services
         Task DeleteAdminAsync(Guid id);
         Task ChangePasswordAsync(Guid id, string currentPassword, string newPassword);
     }
-    public class AdminService : IAdminService
-    {
+    public class AdminService : IAdminService {
         private readonly WorkoutDbContext _context;
         private readonly IConfiguration _configuration;
 
-        public AdminService(WorkoutDbContext context, IConfiguration configuration)
-        {
+        public AdminService(WorkoutDbContext context, IConfiguration configuration) {
             _context = context;
             _configuration = configuration;
         }
 
-        public async Task<AdminResponse> CreateAdminAsync(CreateAdminRequest request)
-        {
+        public async Task<AdminResponse> CreateAdminAsync(CreateAdminRequest request) {
             // Check if email already exists
             var existingAdmin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Email == request.Email);
@@ -36,8 +30,7 @@ namespace WorkoutAPI.Application.Services
             if (existingAdmin != null)
                 throw new InvalidOperationException("Admin with this email already exists");
 
-            var admin = new Admin
-            {
+            var admin = new Admin {
                 Id = Guid.NewGuid(),
                 FirstName = request.FirstName,
                 LastName = request.LastName,
@@ -54,8 +47,7 @@ namespace WorkoutAPI.Application.Services
             return MapToResponse(admin);
         }
 
-        public async Task<LoginResponse> LoginAsync(string email, string password)
-        {
+        public async Task<LoginResponse> LoginAsync(string email, string password) {
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Email == email && a.IsActive);
 
@@ -81,8 +73,7 @@ namespace WorkoutAPI.Application.Services
             );
         }
 
-        public async Task<IEnumerable<AdminResponse>> GetAllAdminsAsync()
-        {
+        public async Task<IEnumerable<AdminResponse>> GetAllAdminsAsync() {
             var admins = await _context.Admins
                 .Where(a => a.IsActive)
                 .OrderBy(a => a.FirstName)
@@ -91,8 +82,7 @@ namespace WorkoutAPI.Application.Services
             return admins.Select(MapToResponse);
         }
 
-        public async Task<AdminResponse> GetAdminByIdAsync(Guid id)
-        {
+        public async Task<AdminResponse> GetAdminByIdAsync(Guid id) {
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Id == id);
 
@@ -102,8 +92,7 @@ namespace WorkoutAPI.Application.Services
             return MapToResponse(admin);
         }
 
-        public async Task<AdminResponse> UpdateAdminAsync(Guid id, UpdateAdminRequest request)
-        {
+        public async Task<AdminResponse> UpdateAdminAsync(Guid id, UpdateAdminRequest request) {
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Id == id);
 
@@ -122,8 +111,7 @@ namespace WorkoutAPI.Application.Services
             return MapToResponse(admin);
         }
 
-        public async Task DeleteAdminAsync(Guid id)
-        {
+        public async Task DeleteAdminAsync(Guid id) {
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Id == id);
 
@@ -136,8 +124,7 @@ namespace WorkoutAPI.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task ChangePasswordAsync(Guid id, string currentPassword, string newPassword)
-        {
+        public async Task ChangePasswordAsync(Guid id, string currentPassword, string newPassword) {
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Id == id);
 
@@ -153,28 +140,24 @@ namespace WorkoutAPI.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        private static string HashPassword(string password)
-        {
+        private static string HashPassword(string password) {
             using var sha256 = SHA256.Create();
             var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(hashedBytes);
         }
 
-        private static bool VerifyPassword(string password, string hash)
-        {
+        private static bool VerifyPassword(string password, string hash) {
             return HashPassword(password) == hash;
         }
 
-        private string GenerateJwtToken(Admin admin)
-        {
+        private string GenerateJwtToken(Admin admin) {
             var jwtKey = _configuration["Jwt:Key"] ?? "DefaultSecretKeyForJWTTokenGeneration";
             var jwtIssuer = _configuration["Jwt:Issuer"] ?? "WorkoutAPI";
             var jwtAudience = _configuration["Jwt:Audience"] ?? "WorkoutAPIUsers";
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(jwtKey);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
+            var tokenDescriptor = new SecurityTokenDescriptor {
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, admin.Id.ToString()),
@@ -193,8 +176,7 @@ namespace WorkoutAPI.Application.Services
             return tokenHandler.WriteToken(token);
         }
 
-        private static AdminResponse MapToResponse(Admin admin)
-        {
+        private static AdminResponse MapToResponse(Admin admin) {
             return new AdminResponse(
                 Id: admin.Id,
                 FirstName: admin.FirstName,

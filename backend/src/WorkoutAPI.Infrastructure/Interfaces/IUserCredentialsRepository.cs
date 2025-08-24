@@ -3,8 +3,7 @@ using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Interfaces;
 
-public interface IUserCredentialsRepository : IRepository<UserCredentials>
-{
+public interface IUserCredentialsRepository : IRepository<UserCredentials> {
     Task<UserCredentials?> GetByUserIdAsync(Guid userId);
     Task<UserCredentials?> GetByEmailAsync(string email);
     Task<IEnumerable<UserCredentials>> GetByRoleAsync(UserRole role);

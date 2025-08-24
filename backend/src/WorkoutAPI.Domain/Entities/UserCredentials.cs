@@ -3,8 +3,7 @@ using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class UserCredentials : BaseEntity
-{
+public class UserCredentials : BaseEntity {
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
     public string PasswordHash { get; set; } = string.Empty;

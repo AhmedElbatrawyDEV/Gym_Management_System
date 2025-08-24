@@ -1,7 +1,6 @@
 namespace WorkoutAPI.Domain.Enums;
 
-public enum Language
-{
+public enum Language {
     Arabic = 1,
     English = 2
 }

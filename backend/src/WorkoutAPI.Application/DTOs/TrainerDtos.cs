@@ -1,5 +1,3 @@
-using WorkoutAPI.Domain.Enums;
-
 namespace WorkoutAPI.Application.DTOs;
 
 public record CreateTrainerRequest(

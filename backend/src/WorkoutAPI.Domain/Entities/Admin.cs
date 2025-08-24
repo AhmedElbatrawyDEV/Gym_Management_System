@@ -2,10 +2,8 @@
 using WorkoutAPI.Domain.Enums;
 
 
-namespace WorkoutAPI.Domain.Entities
-{
-    public class Admin : BaseEntity
-    {
+namespace WorkoutAPI.Domain.Entities {
+    public class Admin : BaseEntity {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;

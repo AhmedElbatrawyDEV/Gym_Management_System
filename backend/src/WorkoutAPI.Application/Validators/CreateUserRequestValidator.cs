@@ -1,13 +1,10 @@
 using FluentValidation;
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Application.Validators;
 
-public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
-{
-    public CreateUserRequestValidator()
-    {
+public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest> {
+    public CreateUserRequestValidator() {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required")
             .MaximumLength(100).WithMessage("First name cannot exceed 100 characters");
@@ -39,10 +36,8 @@ public class CreateUserRequestValidator : AbstractValidator<CreateUserRequest>
     }
 }
 
-public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest>
-{
-    public UpdateUserRequestValidator()
-    {
+public class UpdateUserRequestValidator : AbstractValidator<UpdateUserRequest> {
+    public UpdateUserRequestValidator() {
         RuleFor(x => x.FirstName)
             .NotEmpty().WithMessage("First name is required")
             .MaximumLength(100).WithMessage("First name cannot exceed 100 characters");

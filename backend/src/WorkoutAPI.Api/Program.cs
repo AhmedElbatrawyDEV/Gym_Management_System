@@ -1,18 +1,15 @@
 // Program.cs
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using WorkoutAPI.Infrastructure.Data;
-using WorkoutAPI.Application.Services;
-using WorkoutAPI.Domain.Interfaces;
-using WorkoutAPI.Infrastructure.Repositories;
 using FluentValidation;
-using FluentValidation.AspNetCore;
-using Mapster;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 using WorkoutAPI.Application.Abstractions;
+using WorkoutAPI.Application.Services;
 using WorkoutAPI.Application.Validators;
+using WorkoutAPI.Domain.Interfaces;
+using WorkoutAPI.Infrastructure.Data;
+using WorkoutAPI.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,18 +21,15 @@ builder.Services.AddDbContext<WorkoutDbContext>(options =>
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["Key"] ?? "DefaultSecretKeyForJWTTokenGenerationThatShouldBeAtLeast32Characters";
 
-builder.Services.AddAuthentication(options =>
-{
+builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
-{
+.AddJwtBearer(options => {
     options.SaveToken = true;
     options.RequireHttpsMetadata = false;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
+    options.TokenValidationParameters = new TokenValidationParameters {
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
@@ -47,8 +41,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization(options =>
-{
+builder.Services.AddAuthorization(options => {
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin", "SuperAdmin"));
     options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
 });
@@ -82,10 +75,8 @@ builder.Services.AddMapster();
 builder.Services.AddControllers();
 
 // Configure CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll", policy => {
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
@@ -94,23 +85,19 @@ builder.Services.AddCors(options =>
 
 // Configure Swagger with JWT support
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
+builder.Services.AddSwaggerGen(options => {
+    options.SwaggerDoc("v1", new OpenApiInfo {
         Title = "Workout API - Enhanced Gym Management System",
         Version = "v2.0",
         Description = "Complete gym management system with user management, subscriptions, payments, and attendance tracking.",
-        Contact = new OpenApiContact
-        {
+        Contact = new OpenApiContact {
             Name = "Ahmed Elbatarwy",
             Email = "ahmed@gym.com"
         }
     });
 
     // Add JWT Authentication to Swagger
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
         Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
         Name = "Authorization",
         In = ParameterLocation.Header,
@@ -143,8 +130,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
+    app.UseSwaggerUI(c => {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Workout API v2.0");
         c.RoutePrefix = string.Empty; // Serve Swagger UI at the app's root
     });
@@ -170,8 +156,7 @@ using (var scope = app.Services.CreateScope())
 
         // Alternative: Use migrations in production
         // context.Database.Migrate();
-    }
-    catch (Exception ex)
+    } catch (Exception ex)
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while creating/updating the database");

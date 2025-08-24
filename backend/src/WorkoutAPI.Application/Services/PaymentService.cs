@@ -1,16 +1,10 @@
-using Mapster;
-using Microsoft.Extensions.Logging;
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Application.DTOs.WorkoutAPI.Application.DTOs;
 using WorkoutAPI.Domain.Entities;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
-using WorkoutAPI.Domain.Interfaces;
 
 namespace WorkoutAPI.Application.Services;
 
-public interface IPaymentService
-{
+public interface IPaymentService {
     Task<PaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request);
     Task<PaymentResponse> GetPaymentAsync(Guid id);
     Task<IEnumerable<PaymentResponse>> GetUserPaymentsAsync(Guid userId);
@@ -18,25 +12,21 @@ public interface IPaymentService
     Task<IEnumerable<InvoiceResponse>> GetUserInvoicesAsync(Guid userId);
 }
 
-public class PaymentService : IPaymentService
-{
+public class PaymentService : IPaymentService {
     private readonly WorkoutDbContext _context;
 
-    public PaymentService(WorkoutDbContext context)
-    {
+    public PaymentService(WorkoutDbContext context) {
         _context = context;
     }
 
-    public async Task<PaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request)
-    {
+    public async Task<PaymentResponse> ProcessPaymentAsync(ProcessPaymentRequest request) {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.Id == request.UserId);
 
         if (user == null)
             throw new KeyNotFoundException("User not found");
 
-        var payment = new Payment
-        {
+        var payment = new Payment {
             Id = Guid.NewGuid(),
             UserId = request.UserId,
             Amount = request.Amount,
@@ -56,8 +46,7 @@ public class PaymentService : IPaymentService
         payment.TransactionId = Guid.NewGuid().ToString("N")[..16];
 
         // Create invoice
-        var invoice = new Invoice
-        {
+        var invoice = new Invoice {
             Id = Guid.NewGuid(),
             UserId = request.UserId,
             PaymentId = payment.Id,
@@ -76,8 +65,7 @@ public class PaymentService : IPaymentService
         return MapPaymentToResponse(payment);
     }
 
-    public async Task<PaymentResponse> GetPaymentAsync(Guid id)
-    {
+    public async Task<PaymentResponse> GetPaymentAsync(Guid id) {
         var payment = await _context.Payments
             .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -87,8 +75,7 @@ public class PaymentService : IPaymentService
         return MapPaymentToResponse(payment);
     }
 
-    public async Task<IEnumerable<PaymentResponse>> GetUserPaymentsAsync(Guid userId)
-    {
+    public async Task<IEnumerable<PaymentResponse>> GetUserPaymentsAsync(Guid userId) {
         var payments = await _context.Payments
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)
@@ -97,8 +84,7 @@ public class PaymentService : IPaymentService
         return payments.Select(MapPaymentToResponse);
     }
 
-    public async Task<InvoiceResponse> GetInvoiceAsync(Guid paymentId)
-    {
+    public async Task<InvoiceResponse> GetInvoiceAsync(Guid paymentId) {
         var invoice = await _context.Invoices
             .FirstOrDefaultAsync(i => i.PaymentId == paymentId);
 
@@ -108,8 +94,7 @@ public class PaymentService : IPaymentService
         return MapInvoiceToResponse(invoice);
     }
 
-    public async Task<IEnumerable<InvoiceResponse>> GetUserInvoicesAsync(Guid userId)
-    {
+    public async Task<IEnumerable<InvoiceResponse>> GetUserInvoicesAsync(Guid userId) {
         var invoices = await _context.Invoices
             .Where(i => i.UserId == userId)
             .OrderByDescending(i => i.CreatedAt)
@@ -118,13 +103,11 @@ public class PaymentService : IPaymentService
         return invoices.Select(MapInvoiceToResponse);
     }
 
-    private static string GenerateInvoiceNumber()
-    {
+    private static string GenerateInvoiceNumber() {
         return $"INV-{DateTime.UtcNow:yyyyMMdd}-{Random.Shared.Next(1000, 9999)}";
     }
 
-    private static PaymentResponse MapPaymentToResponse(Payment payment)
-    {
+    private static PaymentResponse MapPaymentToResponse(Payment payment) {
         return new PaymentResponse(
             Id: payment.Id,
             UserId: payment.UserId,
@@ -139,8 +122,7 @@ public class PaymentService : IPaymentService
         );
     }
 
-    private static InvoiceResponse MapInvoiceToResponse(Invoice invoice)
-    {
+    private static InvoiceResponse MapInvoiceToResponse(Invoice invoice) {
         return new InvoiceResponse(
             Id: invoice.Id,
             InvoiceNumber: invoice.InvoiceNumber,

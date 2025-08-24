@@ -1,6 +1,5 @@
 ﻿
-namespace WorkoutAPI.Application.DTOs
-{
+namespace WorkoutAPI.Application.DTOs {
     public record CreateSubscriptionPlanRequest(
         string Name,
         string Description,

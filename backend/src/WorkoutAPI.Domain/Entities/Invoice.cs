@@ -2,10 +2,8 @@
 using WorkoutAPI.Domain.Enums;
 
 
-namespace WorkoutAPI.Domain.Entities
-{
-    public class Invoice : BaseEntity
-    {
+namespace WorkoutAPI.Domain.Entities {
+    public class Invoice : BaseEntity {
         public Guid UserId { get; set; }
         public Guid PaymentId { get; set; }
         public string InvoiceNumber { get; set; } = string.Empty;

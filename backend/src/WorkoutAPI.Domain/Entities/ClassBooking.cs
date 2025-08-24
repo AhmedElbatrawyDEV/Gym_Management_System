@@ -1,13 +1,10 @@
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 
 
-namespace WorkoutAPI.Domain.Entities
-{
+namespace WorkoutAPI.Domain.Entities {
 
-    public class ClassBooking : BaseEntity
-    {
+    public class ClassBooking : BaseEntity {
         public Guid UserId { get; set; }
         public Guid ClassScheduleId { get; set; }
         public DateTime BookingDate { get; set; }

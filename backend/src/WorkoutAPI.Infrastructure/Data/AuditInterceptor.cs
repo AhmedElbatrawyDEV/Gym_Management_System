@@ -1,24 +1,20 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Infrastructure.Interfaces;
 
 namespace WorkoutAPI.Infrastructure.Data;
 
-public class AuditInterceptor : SaveChangesInterceptor
-{
+public class AuditInterceptor : SaveChangesInterceptor {
     private readonly ICurrentUserService _currentUserService;
 
-    public AuditInterceptor(ICurrentUserService currentUserService)
-    {
+    public AuditInterceptor(ICurrentUserService currentUserService) {
         _currentUserService = currentUserService;
     }
 
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
-        InterceptionResult<int> result)
-    {
+        InterceptionResult<int> result) {
         ApplyAuditInfo(eventData.Context);
         return base.SavingChanges(eventData, result);
     }
@@ -26,14 +22,12 @@ public class AuditInterceptor : SaveChangesInterceptor
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
-    {
+        CancellationToken cancellationToken = default) {
         ApplyAuditInfo(eventData.Context);
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private void ApplyAuditInfo(DbContext? context)
-    {
+    private void ApplyAuditInfo(DbContext? context) {
         if (context == null) return;
 
         var currentUser = _currentUserService.UserId;

@@ -1,7 +1,6 @@
 ﻿using WorkoutAPI.Domain.Enums;
 
-namespace WorkoutAPI.Application.DTOs
-{
+namespace WorkoutAPI.Application.DTOs {
     public record CreateAdminRequest(
         string FirstName,
         string LastName,

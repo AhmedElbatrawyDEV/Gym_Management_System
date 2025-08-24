@@ -1,10 +1,8 @@
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Entities.WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 
-public class Payment : BaseEntity
-{
+public class Payment : BaseEntity {
     public Guid UserId { get; set; }
     public Guid? UserSubscriptionId { get; set; }
     public decimal Amount { get; set; }

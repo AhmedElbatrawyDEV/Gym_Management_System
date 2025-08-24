@@ -1,7 +1,6 @@
 namespace WorkoutAPI.Domain.Enums;
 
-public enum MembershipType
-{
+public enum MembershipType {
     Monthly = 1,
     Quarterly = 2,
     Annually = 3,

@@ -8,13 +8,11 @@ namespace WorkoutAPI.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class TrainersController : ControllerBase
-{
+public class TrainersController : ControllerBase {
     private readonly ITrainerService _trainerService;
     private readonly ILogger<TrainersController> _logger;
 
-    public TrainersController(ITrainerService trainerService, ILogger<TrainersController> logger)
-    {
+    public TrainersController(ITrainerService trainerService, ILogger<TrainersController> logger) {
         _trainerService = trainerService;
         _logger = logger;
     }
@@ -23,14 +21,12 @@ public class TrainersController : ControllerBase
     /// Get all available trainers
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<TrainerResponse>>> GetTrainers()
-    {
+    public async Task<ActionResult<IEnumerable<TrainerResponse>>> GetTrainers() {
         try
         {
             var trainers = await _trainerService.GetAvailableTrainersAsync();
             return Ok(trainers);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting trainers");
             return StatusCode(500, "An error occurred while processing your request");
@@ -41,8 +37,7 @@ public class TrainersController : ControllerBase
     /// Get trainer by ID
     /// </summary>
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<TrainerResponse>> GetTrainer(Guid id)
-    {
+    public async Task<ActionResult<TrainerResponse>> GetTrainer(Guid id) {
         try
         {
             var trainer = await _trainerService.GetTrainerByIdAsync(id);
@@ -52,8 +47,7 @@ public class TrainersController : ControllerBase
             }
 
             return Ok(trainer);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting trainer {TrainerId}", id);
             return StatusCode(500, "An error occurred while processing your request");
@@ -64,8 +58,7 @@ public class TrainersController : ControllerBase
     /// Get trainer by user ID
     /// </summary>
     [HttpGet("by-user/{userId:guid}")]
-    public async Task<ActionResult<TrainerResponse>> GetTrainerByUserId(Guid userId)
-    {
+    public async Task<ActionResult<TrainerResponse>> GetTrainerByUserId(Guid userId) {
         try
         {
             var trainer = await _trainerService.GetTrainerByUserIdAsync(userId);
@@ -75,8 +68,7 @@ public class TrainersController : ControllerBase
             }
 
             return Ok(trainer);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting trainer by user ID {UserId}", userId);
             return StatusCode(500, "An error occurred while processing your request");
@@ -87,14 +79,12 @@ public class TrainersController : ControllerBase
     /// Get trainers by specialization
     /// </summary>
     [HttpGet("by-specialization/{specialization}")]
-    public async Task<ActionResult<IEnumerable<TrainerResponse>>> GetTrainersBySpecialization(string specialization)
-    {
+    public async Task<ActionResult<IEnumerable<TrainerResponse>>> GetTrainersBySpecialization(string specialization) {
         try
         {
             var trainers = await _trainerService.GetTrainersBySpecializationAsync(specialization);
             return Ok(trainers);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while getting trainers by specialization {Specialization}", specialization);
             return StatusCode(500, "An error occurred while processing your request");
@@ -105,24 +95,20 @@ public class TrainersController : ControllerBase
     /// Create a new trainer
     /// </summary>
     [HttpPost]
-    public async Task<ActionResult<TrainerResponse>> CreateTrainer([FromBody] CreateTrainerRequest request)
-    {
+    public async Task<ActionResult<TrainerResponse>> CreateTrainer([FromBody] CreateTrainerRequest request) {
         try
         {
             var trainer = await _trainerService.CreateTrainerAsync(request);
             return CreatedAtAction(nameof(GetTrainer), new { id = trainer.Id }, trainer);
-        }
-        catch (ArgumentException ex)
+        } catch (ArgumentException ex)
         {
             _logger.LogWarning(ex, "Invalid argument while creating trainer");
             return BadRequest(ex.Message);
-        }
-        catch (InvalidOperationException ex)
+        } catch (InvalidOperationException ex)
         {
             _logger.LogWarning(ex, "Invalid operation while creating trainer");
             return Conflict(ex.Message);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while creating trainer");
             return StatusCode(500, "An error occurred while processing your request");
@@ -133,19 +119,16 @@ public class TrainersController : ControllerBase
     /// Update an existing trainer
     /// </summary>
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<TrainerResponse>> UpdateTrainer(Guid id, [FromBody] UpdateTrainerRequest request)
-    {
+    public async Task<ActionResult<TrainerResponse>> UpdateTrainer(Guid id, [FromBody] UpdateTrainerRequest request) {
         try
         {
             var trainer = await _trainerService.UpdateTrainerAsync(id, request);
             return Ok(trainer);
-        }
-        catch (ArgumentException ex)
+        } catch (ArgumentException ex)
         {
             _logger.LogWarning(ex, "Trainer not found for update: {TrainerId}", id);
             return NotFound(ex.Message);
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while updating trainer {TrainerId}", id);
             return StatusCode(500, "An error occurred while processing your request");
@@ -156,8 +139,7 @@ public class TrainersController : ControllerBase
     /// Delete a trainer (soft delete)
     /// </summary>
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult> DeleteTrainer(Guid id)
-    {
+    public async Task<ActionResult> DeleteTrainer(Guid id) {
         try
         {
             var result = await _trainerService.DeleteTrainerAsync(id);
@@ -167,8 +149,7 @@ public class TrainersController : ControllerBase
             }
 
             return NoContent();
-        }
-        catch (Exception ex)
+        } catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while deleting trainer {TrainerId}", id);
             return StatusCode(500, "An error occurred while processing your request");

@@ -4,13 +4,11 @@ using WorkoutAPI.Infrastructure.Interfaces;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class EfRepository<T> : IRepository<T> where T : BaseEntity
-{
+public class EfRepository<T> : IRepository<T> where T : BaseEntity {
     private readonly DbContext _db;
     private readonly DbSet<T> _set;
 
-    public EfRepository(DbContext db)
-    {
+    public EfRepository(DbContext db) {
         _db = db;
         _set = _db.Set<T>();
     }
@@ -21,23 +19,20 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
     public async Task<List<T>> ListAsync()
         => await _set.Where(x => !x.IsDeleted).ToListAsync();
 
-    public async Task<T> AddAsync(T entity, string? createdBy = null)
-    {
+    public async Task<T> AddAsync(T entity, string? createdBy = null) {
         entity.SetCreated(createdBy);
         await _set.AddAsync(entity);
         await _db.SaveChangesAsync();
         return entity;
     }
 
-    public async Task UpdateAsync(T entity, string? updatedBy = null)
-    {
+    public async Task UpdateAsync(T entity, string? updatedBy = null) {
         entity.SetUpdated(updatedBy);
         _set.Update(entity);
         await _db.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id, string? deletedBy = null)
-    {
+    public async Task DeleteAsync(Guid id, string? deletedBy = null) {
         var entity = await GetByIdAsync(id);
         if (entity is null) return;
 
@@ -45,8 +40,7 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
         await UpdateAsync(entity, deletedBy);
     }
 
-    public async Task HardDeleteAsync(Guid id)
-    {
+    public async Task HardDeleteAsync(Guid id) {
         var entity = await GetByIdAsync(id);
         if (entity is null) return;
 
@@ -54,8 +48,7 @@ public class EfRepository<T> : IRepository<T> where T : BaseEntity
         await _db.SaveChangesAsync();
     }
 
-    public async Task RestoreAsync(Guid id, string? restoredBy = null)
-    {
+    public async Task RestoreAsync(Guid id, string? restoredBy = null) {
         var entity = await _set.IgnoreQueryFilters()
             .FirstOrDefaultAsync(x => x.Id == id && x.IsDeleted);
 

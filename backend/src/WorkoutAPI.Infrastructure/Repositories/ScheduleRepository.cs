@@ -5,14 +5,11 @@ using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class ScheduleRepository : Repository<Schedule>, IScheduleRepository
-{
-    public ScheduleRepository(WorkoutDbContext context) : base(context)
-    {
+public class ScheduleRepository : Repository<Schedule>, IScheduleRepository {
+    public ScheduleRepository(WorkoutDbContext context) : base(context) {
     }
 
-    public async Task<IEnumerable<Schedule>> GetSchedulesByTrainerIdAsync(Guid trainerId)
-    {
+    public async Task<IEnumerable<Schedule>> GetSchedulesByTrainerIdAsync(Guid trainerId) {
         return await _dbSet
             .Include(s => s.Trainer)
                 .ThenInclude(t => t.User)
@@ -23,8 +20,7 @@ public class ScheduleRepository : Repository<Schedule>, IScheduleRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Schedule>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate)
-    {
+    public async Task<IEnumerable<Schedule>> GetSchedulesByDateRangeAsync(DateTime startDate, DateTime endDate) {
         return await _dbSet
             .Include(s => s.Trainer)
                 .ThenInclude(t => t.User)
@@ -35,8 +31,7 @@ public class ScheduleRepository : Repository<Schedule>, IScheduleRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Schedule>> GetAvailableSchedulesAsync()
-    {
+    public async Task<IEnumerable<Schedule>> GetAvailableSchedulesAsync() {
         return await _dbSet
             .Include(s => s.Trainer)
                 .ThenInclude(t => t.User)
@@ -47,8 +42,7 @@ public class ScheduleRepository : Repository<Schedule>, IScheduleRepository
             .ToListAsync();
     }
 
-    public async Task<Schedule?> GetScheduleWithDetailsAsync(Guid scheduleId)
-    {
+    public async Task<Schedule?> GetScheduleWithDetailsAsync(Guid scheduleId) {
         return await _dbSet
             .Include(s => s.Trainer)
                 .ThenInclude(t => t.User)

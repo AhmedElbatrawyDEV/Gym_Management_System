@@ -1,14 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
-using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Infrastructure.Data;
 
-public static class SeedData
-{
-    public static async Task SeedAsync(WorkoutDbContext context)
-    {
+public static class SeedData {
+    public static async Task SeedAsync(WorkoutDbContext context) {
         // Check if data already exists
         if (await context.Users.AnyAsync() || await context.Exercises.AnyAsync())
         {
@@ -17,21 +14,20 @@ public static class SeedData
 
         // Seed Users
         await SeedUsers(context);
-        
+
         // Seed Exercises
         await SeedExercises(context);
-        
+
         // Seed Workout Plans
         await SeedWorkoutPlans(context);
-        
+
         // Seed User Workout Plans
         await SeedUserWorkoutPlans(context);
 
         await context.SaveChangesAsync();
     }
 
-    private static async Task SeedUsers(WorkoutDbContext context)
-    {
+    private static async Task SeedUsers(WorkoutDbContext context) {
         var users = new List<User>
         {
             new User
@@ -89,8 +85,7 @@ public static class SeedData
         await context.Users.AddRangeAsync(users);
     }
 
-    private static async Task SeedExercises(WorkoutDbContext context)
-    {
+    private static async Task SeedExercises(WorkoutDbContext context) {
         var exercises = new List<Exercise>();
         var exerciseTranslations = new List<ExerciseTranslation>();
 
@@ -148,8 +143,7 @@ public static class SeedData
         // Create Exercise entities for Push exercises
         foreach (var pushEx in pushExerciseData)
         {
-            var exercise = new Exercise
-            {
+            var exercise = new Exercise {
                 Code = pushEx.Code,
                 Type = ExerciseType.Push,
                 PrimaryMuscleGroup = pushEx.PrimaryMuscle,
@@ -161,16 +155,14 @@ public static class SeedData
             exercises.Add(exercise);
 
             // Add translations
-            exerciseTranslations.Add(new ExerciseTranslation
-            {
+            exerciseTranslations.Add(new ExerciseTranslation {
                 ExerciseId = exercise.Id,
                 Language = Language.English,
                 Name = pushEx.NameEn,
                 Description = pushEx.DescEn
             });
 
-            exerciseTranslations.Add(new ExerciseTranslation
-            {
+            exerciseTranslations.Add(new ExerciseTranslation {
                 ExerciseId = exercise.Id,
                 Language = Language.Arabic,
                 Name = pushEx.NameAr,
@@ -181,8 +173,7 @@ public static class SeedData
         // Create Exercise entities for Pull exercises
         foreach (var pullEx in pullExerciseData)
         {
-            var exercise = new Exercise
-            {
+            var exercise = new Exercise {
                 Code = pullEx.Code,
                 Type = ExerciseType.Pull,
                 PrimaryMuscleGroup = pullEx.PrimaryMuscle,
@@ -194,16 +185,14 @@ public static class SeedData
             exercises.Add(exercise);
 
             // Add translations
-            exerciseTranslations.Add(new ExerciseTranslation
-            {
+            exerciseTranslations.Add(new ExerciseTranslation {
                 ExerciseId = exercise.Id,
                 Language = Language.English,
                 Name = pullEx.NameEn,
                 Description = pullEx.DescEn
             });
 
-            exerciseTranslations.Add(new ExerciseTranslation
-            {
+            exerciseTranslations.Add(new ExerciseTranslation {
                 ExerciseId = exercise.Id,
                 Language = Language.Arabic,
                 Name = pullEx.NameAr,
@@ -214,8 +203,7 @@ public static class SeedData
         // Create Exercise entities for Leg exercises
         foreach (var legEx in legExerciseData)
         {
-            var exercise = new Exercise
-            {
+            var exercise = new Exercise {
                 Code = legEx.Code,
                 Type = ExerciseType.Legs,
                 PrimaryMuscleGroup = legEx.PrimaryMuscle,
@@ -227,16 +215,14 @@ public static class SeedData
             exercises.Add(exercise);
 
             // Add translations
-            exerciseTranslations.Add(new ExerciseTranslation
-            {
+            exerciseTranslations.Add(new ExerciseTranslation {
                 ExerciseId = exercise.Id,
                 Language = Language.English,
                 Name = legEx.NameEn,
                 Description = legEx.DescEn
             });
 
-            exerciseTranslations.Add(new ExerciseTranslation
-            {
+            exerciseTranslations.Add(new ExerciseTranslation {
                 ExerciseId = exercise.Id,
                 Language = Language.Arabic,
                 Name = legEx.NameAr,
@@ -248,8 +234,7 @@ public static class SeedData
         await context.ExerciseTranslations.AddRangeAsync(exerciseTranslations);
     }
 
-    private static async Task SeedWorkoutPlans(WorkoutDbContext context)
-    {
+    private static async Task SeedWorkoutPlans(WorkoutDbContext context) {
         var workoutPlans = new List<WorkoutPlan>();
         var workoutPlanTranslations = new List<WorkoutPlanTranslation>();
         var workoutPlanExercises = new List<WorkoutPlanExercise>();
@@ -260,24 +245,21 @@ public static class SeedData
         var legExercises = await context.Exercises.Where(e => e.Type == ExerciseType.Legs).Take(12).ToListAsync();
 
         // Push Day Plan
-        var pushPlan = new WorkoutPlan
-        {
+        var pushPlan = new WorkoutPlan {
             Code = "PUSH_DAY_PLAN",
             Type = ExerciseType.Push,
             IsActive = true
         };
         workoutPlans.Add(pushPlan);
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation
-        {
+        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
             WorkoutPlanId = pushPlan.Id,
             Language = Language.English,
             Name = "Push Day Workout",
             Description = "Complete push workout targeting chest, shoulders, and triceps with 12 exercises"
         });
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation
-        {
+        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
             WorkoutPlanId = pushPlan.Id,
             Language = Language.Arabic,
             Name = "يوم الدفع",
@@ -287,8 +269,7 @@ public static class SeedData
         // Add exercises to push plan
         for (int i = 0; i < pushExercises.Count; i++)
         {
-            workoutPlanExercises.Add(new WorkoutPlanExercise
-            {
+            workoutPlanExercises.Add(new WorkoutPlanExercise {
                 WorkoutPlanId = pushPlan.Id,
                 ExerciseId = pushExercises[i].Id,
                 Order = i + 1,
@@ -299,24 +280,21 @@ public static class SeedData
         }
 
         // Pull Day Plan
-        var pullPlan = new WorkoutPlan
-        {
+        var pullPlan = new WorkoutPlan {
             Code = "PULL_DAY_PLAN",
             Type = ExerciseType.Pull,
             IsActive = true
         };
         workoutPlans.Add(pullPlan);
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation
-        {
+        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
             WorkoutPlanId = pullPlan.Id,
             Language = Language.English,
             Name = "Pull Day Workout",
             Description = "Complete pull workout targeting back, biceps, and rear delts with 12 exercises"
         });
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation
-        {
+        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
             WorkoutPlanId = pullPlan.Id,
             Language = Language.Arabic,
             Name = "يوم السحب",
@@ -326,8 +304,7 @@ public static class SeedData
         // Add exercises to pull plan
         for (int i = 0; i < pullExercises.Count; i++)
         {
-            workoutPlanExercises.Add(new WorkoutPlanExercise
-            {
+            workoutPlanExercises.Add(new WorkoutPlanExercise {
                 WorkoutPlanId = pullPlan.Id,
                 ExerciseId = pullExercises[i].Id,
                 Order = i + 1,
@@ -338,24 +315,21 @@ public static class SeedData
         }
 
         // Legs Day Plan
-        var legsPlan = new WorkoutPlan
-        {
+        var legsPlan = new WorkoutPlan {
             Code = "LEGS_DAY_PLAN",
             Type = ExerciseType.Legs,
             IsActive = true
         };
         workoutPlans.Add(legsPlan);
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation
-        {
+        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
             WorkoutPlanId = legsPlan.Id,
             Language = Language.English,
             Name = "Legs Day Workout",
             Description = "Complete legs workout targeting quadriceps, hamstrings, glutes, and calves with 12 exercises"
         });
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation
-        {
+        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
             WorkoutPlanId = legsPlan.Id,
             Language = Language.Arabic,
             Name = "يوم الأرجل",
@@ -365,8 +339,7 @@ public static class SeedData
         // Add exercises to legs plan
         for (int i = 0; i < legExercises.Count; i++)
         {
-            workoutPlanExercises.Add(new WorkoutPlanExercise
-            {
+            workoutPlanExercises.Add(new WorkoutPlanExercise {
                 WorkoutPlanId = legsPlan.Id,
                 ExerciseId = legExercises[i].Id,
                 Order = i + 1,
@@ -381,8 +354,7 @@ public static class SeedData
         await context.WorkoutPlanExercises.AddRangeAsync(workoutPlanExercises);
     }
 
-    private static async Task SeedUserWorkoutPlans(WorkoutDbContext context)
-    {
+    private static async Task SeedUserWorkoutPlans(WorkoutDbContext context) {
         var users = await context.Users.ToListAsync();
         var workoutPlans = await context.WorkoutPlans.ToListAsync();
         var userWorkoutPlans = new List<UserWorkoutPlan>();
@@ -392,8 +364,7 @@ public static class SeedData
         {
             foreach (var plan in workoutPlans)
             {
-                userWorkoutPlans.Add(new UserWorkoutPlan
-                {
+                userWorkoutPlans.Add(new UserWorkoutPlan {
                     UserId = user.Id,
                     WorkoutPlanId = plan.Id,
                     AssignedDate = DateTime.UtcNow.AddDays(-Random.Shared.Next(1, 15)),

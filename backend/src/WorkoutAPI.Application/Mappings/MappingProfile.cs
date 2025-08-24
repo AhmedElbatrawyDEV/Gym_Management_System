@@ -6,15 +6,12 @@ using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Application.Mappings;
 
-public static class MappingProfile
-{
-    public static void Configure()
-    {
+public static class MappingProfile {
+    public static void Configure() {
         // User mappings
         TypeAdapterConfig<CreateUserRequest, User>
             .NewConfig()
             .Map(dest => dest.Id, src => Guid.NewGuid())
-            .Map(dest => dest.IsActive, src => true)
             .Map(dest => dest.CreatedAt, src => DateTime.UtcNow);
 
         TypeAdapterConfig<User, UserResponse>
@@ -67,17 +64,15 @@ public static class MappingProfile
             .Map(dest => dest.Type, src => src.WorkoutPlan.Type);
     }
 
-    private static ExerciseTranslation GetTranslation(ICollection<ExerciseTranslation> translations, Language language)
-    {
-        return translations.FirstOrDefault(t => t.Language == language) 
-               ?? translations.FirstOrDefault() 
+    private static ExerciseTranslation GetTranslation(ICollection<ExerciseTranslation> translations, Language language) {
+        return translations.FirstOrDefault(t => t.Language == language)
+               ?? translations.FirstOrDefault()
                ?? new ExerciseTranslation { Name = "Unknown", Description = null, Instructions = null };
     }
 
-    private static WorkoutPlanTranslation GetWorkoutPlanTranslation(ICollection<WorkoutPlanTranslation> translations, Language language)
-    {
-        return translations.FirstOrDefault(t => t.Language == language) 
-               ?? translations.FirstOrDefault() 
+    private static WorkoutPlanTranslation GetWorkoutPlanTranslation(ICollection<WorkoutPlanTranslation> translations, Language language) {
+        return translations.FirstOrDefault(t => t.Language == language)
+               ?? translations.FirstOrDefault()
                ?? new WorkoutPlanTranslation { Name = "Unknown", Description = null, Goals = null };
     }
 }
