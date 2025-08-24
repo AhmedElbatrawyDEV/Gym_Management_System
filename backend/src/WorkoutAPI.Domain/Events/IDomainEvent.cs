@@ -1,8 +1,17 @@
-namespace WorkoutAPI.Domain.Events;
+using WorkoutAPI.Domain.Common;
 
-public interface IDomainEvent {
-    DateTime OccurredOn { get; }
-    Guid EventId { get; }
+namespace WorkoutAPI.Domain.Events;
+public interface INotification {
+}
+public interface IMessage : INotification {
+    Guid Id => Guid.NewGuid();
+
+    DateTimeOffset TimeStamp => DateTimeOffset.UtcNow;
+}
+public interface IEvent : IMessage {
+}
+
+public interface IDomainEvent : IEvent {
 }
 
 public abstract class DomainEvent : IDomainEvent {
@@ -10,3 +19,16 @@ public abstract class DomainEvent : IDomainEvent {
     public Guid EventId { get; } = Guid.NewGuid();
 }
 
+public abstract record AggregateDomainEvent<T> : IDomainEvent where T : IAggregateRoot {
+    public T Aggregate { get; }
+
+    protected AggregateDomainEvent(T aggregate) {
+        Aggregate = aggregate;
+    }
+}
+
+public record AggregateCreatedEvent<T> : AggregateDomainEvent<T> where T : IAggregateRoot {
+    public AggregateCreatedEvent(T aggregate)
+        : base(aggregate) {
+    }
+}

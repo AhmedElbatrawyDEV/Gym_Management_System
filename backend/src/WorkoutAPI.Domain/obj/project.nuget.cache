@@ -1,11 +1,17 @@
 {
   "version": 2,
-  "dgSpecHash": "WY3nZCEmtps=",
+  "dgSpecHash": "tDDyhArspPQ=",
   "success": true,
   "projectFilePath": "C:\\workoutrepo\\Gym_Management_System\\backend\\src\\WorkoutAPI.Domain\\WorkoutAPI.Domain.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\asayed.c\\.nuget\\packages\\comparenetobjects\\4.84.0\\comparenetobjects.4.84.0.nupkg.sha512",
     "C:\\Users\\asayed.c\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\8.0.0\\microsoft.extensions.dependencyinjection.abstractions.8.0.0.nupkg.sha512",
-    "C:\\Users\\asayed.c\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512"
+    "C:\\Users\\asayed.c\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\8.0.0\\microsoft.extensions.logging.abstractions.8.0.0.nupkg.sha512",
+    "C:\\Users\\asayed.c\\.nuget\\packages\\microsoft.win32.systemevents\\8.0.0\\microsoft.win32.systemevents.8.0.0.nupkg.sha512",
+    "C:\\Users\\asayed.c\\.nuget\\packages\\system.configuration.configurationmanager\\8.0.0\\system.configuration.configurationmanager.8.0.0.nupkg.sha512",
+    "C:\\Users\\asayed.c\\.nuget\\packages\\system.diagnostics.eventlog\\8.0.0\\system.diagnostics.eventlog.8.0.0.nupkg.sha512",
+    "C:\\Users\\asayed.c\\.nuget\\packages\\system.drawing.common\\8.0.0\\system.drawing.common.8.0.0.nupkg.sha512",
+    "C:\\Users\\asayed.c\\.nuget\\packages\\system.security.cryptography.protecteddata\\8.0.0\\system.security.cryptography.protecteddata.8.0.0.nupkg.sha512"
   ],
   "logs": []
 }

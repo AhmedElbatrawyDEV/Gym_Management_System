@@ -1,12 +1,12 @@
-using WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Aggregates;
 
 namespace WorkoutAPI.Domain.Interfaces;
 
 public interface IWorkoutSessionRepository : IRepository<WorkoutSession> {
-    Task<IEnumerable<WorkoutSession>> GetUserSessionsAsync(Guid userId);
-    Task<WorkoutSession?> GetActiveSessionAsync(Guid userId);
-    Task<WorkoutSession?> GetSessionWithExercisesAsync(Guid sessionId);
-    Task<IEnumerable<WorkoutSession>> GetCompletedSessionsAsync(Guid userId, DateTime? fromDate = null);
-    Task<WorkoutSession?> GetLatestSessionAsync(Guid userId);
+    Task<IEnumerable<WorkoutSession>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<WorkoutSession>> GetByTrainerIdAsync(Guid trainerId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<WorkoutSession>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
+    Task<IEnumerable<WorkoutSession>> GetActiveSessionsAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<WorkoutSession>> GetScheduledSessionsAsync(DateTime date, CancellationToken cancellationToken = default);
 }
 

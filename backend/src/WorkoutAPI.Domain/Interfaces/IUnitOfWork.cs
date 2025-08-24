@@ -1,13 +1,19 @@
+using System.Data;
+
 namespace WorkoutAPI.Domain.Interfaces;
 
-public interface IUnitOfWork : IDisposable {
-    IUserRepository Users { get; }
-    IExerciseRepository Exercises { get; }
-    IWorkoutSessionRepository WorkoutSessions { get; }
+public interface IUnitOfWork {
+    [Obsolete("Please use the BeginAsync version")]
+    void Begin();
 
-    Task<int> SaveChangesAsync();
-    Task BeginTransactionAsync();
-    Task CommitTransactionAsync();
-    Task RollbackTransactionAsync();
+    [Obsolete("Please use the BeginAsync version")]
+    void Begin(IsolationLevel isolationLevel);
+
+    Task BeginAsync();
+
+    Task BeginAsync(IsolationLevel isolationLevel);
+
+    Task Commit();
+
+    Task Rollback();
 }
-

@@ -1,69 +1,54 @@
 using Microsoft.EntityFrameworkCore;
-using WorkoutAPI.Domain.Entities;
-using WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Aggregates;
+using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
 using WorkoutAPI.Domain.Interfaces;
 using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class WorkoutSessionRepository : Repository<WorkoutSession>, IWorkoutSessionRepository {
-    public WorkoutSessionRepository(WorkoutDbContext context) : base(context) {
-    }
+public class WorkoutSessionRepository : BaseRepository<WorkoutSession>, IWorkoutSessionRepository {
+    public WorkoutSessionRepository(WorkoutDbContext context) : base(context) { }
 
-    public async Task<IEnumerable<WorkoutSession>> GetUserSessionsAsync(Guid userId) {
+    public async Task<IEnumerable<WorkoutSession>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default) {
         return await _dbSet
             .Where(ws => ws.UserId == userId)
-            .Include(ws => ws.WorkoutPlan)
-                .ThenInclude(wp => wp.Translations)
-            .OrderByDescending(ws => ws.StartTime)
-            .ToListAsync();
-    }
-
-    public async Task<WorkoutSession?> GetActiveSessionAsync(Guid userId) {
-        return await _dbSet
-            .Where(ws => ws.UserId == userId &&
-                        (ws.Status == WorkoutSessionStatus.InProgress || ws.Status == WorkoutSessionStatus.Paused))
-            .Include(ws => ws.WorkoutPlan)
-                .ThenInclude(wp => wp.Translations)
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<WorkoutSession?> GetSessionWithExercisesAsync(Guid sessionId) {
-        return await _dbSet
-            .Where(ws => ws.Id == sessionId)
-            .Include(ws => ws.WorkoutPlan)
-                .ThenInclude(wp => wp.Translations)
             .Include(ws => ws.Exercises)
-                .ThenInclude(wes => wes.Exercise)
-                    .ThenInclude(e => e.Translations)
-            .Include(ws => ws.Exercises)
-                .ThenInclude(wes => wes.Sets)
-            .FirstOrDefaultAsync();
-    }
-
-    public async Task<IEnumerable<WorkoutSession>> GetCompletedSessionsAsync(Guid userId, DateTime? fromDate = null) {
-        var query = _dbSet
-            .Where(ws => ws.UserId == userId && ws.Status == WorkoutSessionStatus.Completed);
-
-        if (fromDate.HasValue)
-        {
-            query = query.Where(ws => ws.StartTime >= fromDate.Value);
-        }
-
-        return await query
-            .Include(ws => ws.WorkoutPlan)
-                .ThenInclude(wp => wp.Translations)
             .OrderByDescending(ws => ws.StartTime)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<WorkoutSession?> GetLatestSessionAsync(Guid userId) {
+    public async Task<IEnumerable<WorkoutSession>> GetByTrainerIdAsync(Guid trainerId, CancellationToken cancellationToken = default) {
         return await _dbSet
-            .Where(ws => ws.UserId == userId)
-            .Include(ws => ws.WorkoutPlan)
-                .ThenInclude(wp => wp.Translations)
+            .Where(ws => ws.TrainerId == trainerId)
+            .Include(ws => ws.Exercises)
             .OrderByDescending(ws => ws.StartTime)
-            .FirstOrDefaultAsync();
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<WorkoutSession>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default) {
+        return await _dbSet
+            .Where(ws => ws.StartTime >= startDate && ws.StartTime <= endDate)
+            .Include(ws => ws.Exercises)
+            .OrderBy(ws => ws.StartTime)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<WorkoutSession>> GetActiveSessionsAsync(CancellationToken cancellationToken = default) {
+        return await _dbSet
+            .Where(ws => ws.Status == WorkoutSessionStatus.InProgress)
+            .Include(ws => ws.Exercises)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<WorkoutSession>> GetScheduledSessionsAsync(DateTime date, CancellationToken cancellationToken = default) {
+        var startOfDay = date.Date;
+        var endOfDay = startOfDay.AddDays(1).AddTicks(-1);
+
+        return await _dbSet
+            .Where(ws => ws.Status == WorkoutSessionStatus.Scheduled &&
+                        ws.StartTime >= startOfDay && ws.StartTime <= endOfDay)
+            .Include(ws => ws.Exercises)
+            .OrderBy(ws => ws.StartTime)
+            .ToListAsync(cancellationToken);
     }
 }
-

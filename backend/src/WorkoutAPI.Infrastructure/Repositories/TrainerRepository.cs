@@ -5,39 +5,23 @@ using WorkoutAPI.Infrastructure.Data;
 
 namespace WorkoutAPI.Infrastructure.Repositories;
 
-public class TrainerRepository : Repository<Trainer>, ITrainerRepository {
-    public TrainerRepository(WorkoutDbContext context) : base(context) {
+public class TrainerRepository : BaseRepository<Trainer>, ITrainerRepository {
+    public TrainerRepository(WorkoutDbContext context) : base(context) { }
+
+    public async Task<IEnumerable<Trainer>> GetAvailableTrainersAsync(CancellationToken cancellationToken = default) {
+        return await _dbSet
+            .Where(t => t.IsAvailable)
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<Trainer?> GetByUserIdAsync(Guid userId) {
+    public async Task<IEnumerable<Trainer>> GetBySpecializationAsync(string specialization, CancellationToken cancellationToken = default) {
         return await _dbSet
-            .Include(t => t.User)
-            .FirstOrDefaultAsync(t => t.UserId == userId);
+            .Where(t => t.Specialization.ToLower().Contains(specialization.ToLower()) && t.IsAvailable)
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Trainer>> GetAvailableTrainersAsync() {
+    public async Task<Trainer?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default) {
         return await _dbSet
-            .Include(t => t.User)
-            .Where(t => t.IsAvailable && t.User.IsActive)
-            .OrderBy(t => t.User.FirstName)
-            .ThenBy(t => t.User.LastName)
-            .ToListAsync();
-    }
-
-    public async Task<Trainer?> GetTrainerWithSchedulesAsync(Guid trainerId) {
-        return await _dbSet
-            .Include(t => t.User)
-            .Include(t => t.ScheduledSessions)
-            .FirstOrDefaultAsync(t => t.Id == trainerId);
-    }
-
-    public async Task<IEnumerable<Trainer>> GetTrainersBySpecializationAsync(string specialization) {
-        return await _dbSet
-            .Include(t => t.User)
-            .Where(t => t.Specialization.Contains(specialization) && t.IsAvailable)
-            .OrderBy(t => t.User.FirstName)
-            .ThenBy(t => t.User.LastName)
-            .ToListAsync();
+            .FirstOrDefaultAsync(t => t.UserId == userId, cancellationToken);
     }
 }
-

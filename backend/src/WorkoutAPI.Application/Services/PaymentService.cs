@@ -1,5 +1,5 @@
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Application.Services;

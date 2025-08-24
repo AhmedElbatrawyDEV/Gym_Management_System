@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Security.Cryptography;
 using System.Text;
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Enums;
 using WorkoutAPI.Domain.Interfaces;
 

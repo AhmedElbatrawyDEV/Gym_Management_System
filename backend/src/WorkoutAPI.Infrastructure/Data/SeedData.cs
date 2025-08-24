@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 

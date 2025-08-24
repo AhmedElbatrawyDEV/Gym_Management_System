@@ -1,5 +1,6 @@
 using Mapster;
 using WorkoutAPI.Application.DTOs;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 using WorkoutAPI.Domain.ValueObjects;

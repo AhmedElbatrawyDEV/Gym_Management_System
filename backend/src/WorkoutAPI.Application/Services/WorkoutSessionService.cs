@@ -1,4 +1,4 @@
-using WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Interfaces;
 using WorkoutAPI.Domain.ValueObjects;
 public interface IWorkoutSessionService {

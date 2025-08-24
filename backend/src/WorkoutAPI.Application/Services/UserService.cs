@@ -1,7 +1,7 @@
 using Mapster;
 using Microsoft.Extensions.Logging;
 using WorkoutAPI.Application.DTOs;
-using WorkoutAPI.Domain.Entities;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Interfaces;
 
 namespace WorkoutAPI.Application.Services;

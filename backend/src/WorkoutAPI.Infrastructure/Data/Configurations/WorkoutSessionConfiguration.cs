@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Entities;
 
 namespace WorkoutAPI.Infrastructure.Data.Configurations;
