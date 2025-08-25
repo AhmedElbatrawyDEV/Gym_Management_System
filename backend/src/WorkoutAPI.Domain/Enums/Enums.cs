@@ -1,15 +1,16 @@
 namespace WorkoutAPI.Domain.Enums;
-namespace WorkoutAPI.Domain.Enums;
 
 // User related enums
-public enum Gender {
+public enum Gender
+{
     Male = 1,
     Female = 2,
     Other = 3,
     PreferNotToSay = 4
 }
 
-public enum UserStatus {
+public enum UserStatus
+{
     Pending = 0,
     Active = 1,
     Inactive = 2,
@@ -17,7 +18,8 @@ public enum UserStatus {
     Deleted = 4
 }
 
-public enum Language {
+public enum Language
+{
     English = 1,
     Arabic = 2,
     French = 3,
@@ -26,7 +28,8 @@ public enum Language {
 }
 
 // Exercise related enums
-public enum ExerciseType {
+public enum ExerciseType
+{
     Strength = 1,
     Cardio = 2,
     Flexibility = 3,
@@ -37,7 +40,8 @@ public enum ExerciseType {
     Sport = 8
 }
 
-public enum MuscleGroup {
+public enum MuscleGroup
+{
     // Upper Body
     Chest = 1,
     Back = 2,
@@ -66,7 +70,8 @@ public enum MuscleGroup {
     Core = 17
 }
 
-public enum DifficultyLevel {
+public enum DifficultyLevel
+{
     Beginner = 1,
     Intermediate = 2,
     Advanced = 3,
@@ -74,7 +79,8 @@ public enum DifficultyLevel {
 }
 
 // Workout related enums
-public enum WorkoutSessionStatus {
+public enum WorkoutSessionStatus
+{
     Scheduled = 1,
     InProgress = 2,
     Completed = 3,
@@ -82,7 +88,8 @@ public enum WorkoutSessionStatus {
     NoShow = 5
 }
 
-public enum ActivityType {
+public enum ActivityType
+{
     GeneralWorkout = 1,
     Cardio = 2,
     Strength = 3,
@@ -96,7 +103,8 @@ public enum ActivityType {
 }
 
 // Subscription related enums
-public enum MembershipType {
+public enum MembershipType
+{
     Basic = 1,
     Standard = 2,
     Premium = 3,
@@ -107,7 +115,8 @@ public enum MembershipType {
     Family = 8
 }
 
-public enum SubscriptionStatus {
+public enum SubscriptionStatus
+{
     Active = 1,
     Expired = 2,
     Cancelled = 3,
@@ -117,7 +126,8 @@ public enum SubscriptionStatus {
 }
 
 // Payment related enums
-public enum PaymentMethod {
+public enum PaymentMethod
+{
     Cash = 1,
     CreditCard = 2,
     DebitCard = 3,
@@ -134,7 +144,8 @@ public enum PaymentMethod {
     Tamara = 14      // Buy now, pay later (popular in Saudi)
 }
 
-public enum PaymentStatus {
+public enum PaymentStatus
+{
     Pending = 1,
     Processing = 2,
     Completed = 3,
@@ -146,7 +157,8 @@ public enum PaymentStatus {
     OnHold = 9
 }
 
-public enum InvoiceStatus {
+public enum InvoiceStatus
+{
     Draft = 1,
     Sent = 2,
     Viewed = 3,
@@ -158,7 +170,8 @@ public enum InvoiceStatus {
 }
 
 // Class and booking related enums
-public enum BookingStatus {
+public enum BookingStatus
+{
     Confirmed = 1,
     Pending = 2,
     Cancelled = 3,
@@ -168,7 +181,8 @@ public enum BookingStatus {
     CheckedIn = 7
 }
 
-public enum ClassStatus {
+public enum ClassStatus
+{
     Scheduled = 1,
     InProgress = 2,
     Completed = 3,
@@ -178,7 +192,8 @@ public enum ClassStatus {
 }
 
 // Days of the week for scheduling
-public enum DayOfWeek {
+public enum DayOfWeek
+{
     Sunday = 0,
     Monday = 1,
     Tuesday = 2,
@@ -189,7 +204,8 @@ public enum DayOfWeek {
 }
 
 // Workout plan related enums
-public enum WorkoutPlanType {
+public enum WorkoutPlanType
+{
     WeightLoss = 1,
     MuscleGain = 2,
     Strength = 3,
@@ -203,7 +219,8 @@ public enum WorkoutPlanType {
     Advanced = 11
 }
 
-public enum WorkoutPlanStatus {
+public enum WorkoutPlanStatus
+{
     Draft = 1,
     Active = 2,
     Inactive = 3,
@@ -212,7 +229,8 @@ public enum WorkoutPlanStatus {
 }
 
 // Trainer related enums
-public enum TrainerStatus {
+public enum TrainerStatus
+{
     Active = 1,
     Inactive = 2,
     OnLeave = 3,
@@ -220,7 +238,8 @@ public enum TrainerStatus {
     Terminated = 5
 }
 
-public enum CertificationLevel {
+public enum CertificationLevel
+{
     Basic = 1,
     Intermediate = 2,
     Advanced = 3,
@@ -229,7 +248,8 @@ public enum CertificationLevel {
 }
 
 // Equipment related enums
-public enum EquipmentType {
+public enum EquipmentType
+{
     Cardio = 1,
     Strength = 2,
     FreeWeights = 3,
@@ -240,7 +260,8 @@ public enum EquipmentType {
     Cables = 8
 }
 
-public enum EquipmentStatus {
+public enum EquipmentStatus
+{
     Available = 1,
     InUse = 2,
     Maintenance = 3,
@@ -250,7 +271,8 @@ public enum EquipmentStatus {
 }
 
 // Attendance related enums
-public enum AttendanceStatus {
+public enum AttendanceStatus
+{
     CheckedIn = 1,
     CheckedOut = 2,
     Present = 3,
@@ -260,7 +282,8 @@ public enum AttendanceStatus {
 }
 
 // Notification related enums
-public enum NotificationType {
+public enum NotificationType
+{
     General = 1,
     ClassReminder = 2,
     PaymentDue = 3,
@@ -273,7 +296,8 @@ public enum NotificationType {
     Achievement = 10
 }
 
-public enum NotificationStatus {
+public enum NotificationStatus
+{
     Pending = 1,
     Sent = 2,
     Delivered = 3,
@@ -282,7 +306,8 @@ public enum NotificationStatus {
     Cancelled = 6
 }
 
-public enum NotificationChannel {
+public enum NotificationChannel
+{
     InApp = 1,
     Email = 2,
     SMS = 3,
@@ -291,7 +316,8 @@ public enum NotificationChannel {
 }
 
 // Goal and progress related enums
-public enum GoalType {
+public enum GoalType
+{
     WeightLoss = 1,
     WeightGain = 2,
     MuscleGain = 3,
@@ -304,7 +330,8 @@ public enum GoalType {
     Rehabilitation = 10
 }
 
-public enum GoalStatus {
+public enum GoalStatus
+{
     Active = 1,
     Completed = 2,
     Paused = 3,
@@ -313,7 +340,8 @@ public enum GoalStatus {
 }
 
 // Time period enums
-public enum TimePeriod {
+public enum TimePeriod
+{
     Daily = 1,
     Weekly = 2,
     Monthly = 3,
@@ -322,27 +350,31 @@ public enum TimePeriod {
 }
 
 // Measurement units
-public enum WeightUnit {
+public enum WeightUnit
+{
     Kilograms = 1,
     Pounds = 2,
     Stones = 3
 }
 
-public enum DistanceUnit {
+public enum DistanceUnit
+{
     Kilometers = 1,
     Miles = 2,
     Meters = 3,
     Feet = 4
 }
 
-public enum TemperatureUnit {
+public enum TemperatureUnit
+{
     Celsius = 1,
     Fahrenheit = 2,
     Kelvin = 3
 }
 
 // System and audit enums
-public enum AuditAction {
+public enum AuditAction
+{
     Create = 1,
     Update = 2,
     Delete = 3,
@@ -355,7 +387,8 @@ public enum AuditAction {
     Reject = 10
 }
 
-public enum SystemRole {
+public enum SystemRole
+{
     SuperAdmin = 1,
     Admin = 2,
     Manager = 3,
@@ -367,7 +400,8 @@ public enum SystemRole {
 }
 
 // Priority levels
-public enum Priority {
+public enum Priority
+{
     Low = 1,
     Medium = 2,
     High = 3,
@@ -376,7 +410,8 @@ public enum Priority {
 }
 
 // Status for general use
-public enum GeneralStatus {
+public enum GeneralStatus
+{
     Active = 1,
     Inactive = 2,
     Pending = 3,
@@ -390,7 +425,8 @@ public enum GeneralStatus {
 }
 
 // Communication preferences
-public enum CommunicationPreference {
+public enum CommunicationPreference
+{
     Email = 1,
     SMS = 2,
     Phone = 3,
@@ -400,7 +436,8 @@ public enum CommunicationPreference {
 }
 
 // Age groups
-public enum AgeGroup {
+public enum AgeGroup
+{
     Child = 1,        // Under 13
     Teen = 2,         // 13-17
     YoungAdult = 3,   // 18-25
@@ -409,7 +446,8 @@ public enum AgeGroup {
 }
 
 // Fitness levels
-public enum FitnessLevel {
+public enum FitnessLevel
+{
     Sedentary = 1,
     LightlyActive = 2,
     ModeratelyActive = 3,
@@ -418,7 +456,8 @@ public enum FitnessLevel {
 }
 
 // Medical conditions (for workout restrictions)
-public enum MedicalCondition {
+public enum MedicalCondition
+{
     None = 0,
     HeartDisease = 1,
     Diabetes = 2,
@@ -433,7 +472,8 @@ public enum MedicalCondition {
 }
 
 // Body composition metrics
-public enum BodyMetric {
+public enum BodyMetric
+{
     Weight = 1,
     Height = 2,
     BodyFatPercentage = 3,

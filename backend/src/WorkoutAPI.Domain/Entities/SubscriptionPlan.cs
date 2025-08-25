@@ -5,7 +5,8 @@ using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class SubscriptionPlan : Entity<SubscriptionPlan, Guid> {
+public class SubscriptionPlan : Entity<SubscriptionPlan, Guid>
+{
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public Money Price { get; private set; }
@@ -16,8 +17,10 @@ public class SubscriptionPlan : Entity<SubscriptionPlan, Guid> {
     private SubscriptionPlan() { } // EF Core
 
     public static SubscriptionPlan CreateNew(string name, string description, Money price,
-                                           int durationDays, List<string> features) {
-        return new SubscriptionPlan {
+                                           int durationDays, List<string> features)
+    {
+        return new SubscriptionPlan
+        {
             Id = Guid.NewGuid(),
             Name = name ?? throw new ArgumentNullException(nameof(name)),
             Description = description ?? throw new ArgumentNullException(nameof(description)),
@@ -27,11 +30,13 @@ public class SubscriptionPlan : Entity<SubscriptionPlan, Guid> {
         };
     }
 
-    public void UpdatePrice(Money newPrice) {
+    public void UpdatePrice(Money newPrice)
+    {
         Price = newPrice ?? throw new ArgumentNullException(nameof(newPrice));
     }
 
-    public void AddFeature(string feature) {
+    public void AddFeature(string feature)
+    {
         if (string.IsNullOrWhiteSpace(feature))
             throw new ArgumentException("Feature cannot be empty");
 
@@ -39,7 +44,8 @@ public class SubscriptionPlan : Entity<SubscriptionPlan, Guid> {
             Features.Add(feature);
     }
 
-    public void RemoveFeature(string feature) {
+    public void RemoveFeature(string feature)
+    {
         Features.Remove(feature);
     }
 

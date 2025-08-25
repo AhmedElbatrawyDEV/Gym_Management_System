@@ -2,14 +2,14 @@
 // Entities
 using WorkoutAPI.Domain.Common;
 using WorkoutAPI.Domain.Entities;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 using WorkoutAPI.Domain.Events;
 using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Domain.Aggregates;
 
-// USER AGGREGATE ROOT
-public class User : AggregateRoot<User> {
+public class User : AggregateRoot<User>
+{
     private readonly List<UserSubscription> _subscriptions = new();
     private readonly List<WorkoutSession> _workoutSessions = new();
 
@@ -24,7 +24,8 @@ public class User : AggregateRoot<User> {
 
     public IReadOnlyCollection<UserSubscription> Subscriptions => _subscriptions.AsReadOnly();
     public IReadOnlyCollection<WorkoutSession> WorkoutSessions => _workoutSessions.AsReadOnly();
-    public static User CreateNew(PersonalInfo personalInfo, ContactInfo contactInfo, Language preferredLanguage) {
+    public static User CreateNew(PersonalInfo personalInfo, ContactInfo contactInfo, Language preferredLanguage)
+    {
         var user = BaseFactory.Create();
         user.PersonalInfo = personalInfo ?? throw new ArgumentNullException(nameof(personalInfo));
         user.ContactInfo = contactInfo ?? throw new ArgumentNullException(nameof(contactInfo));
@@ -38,54 +39,63 @@ public class User : AggregateRoot<User> {
         return user;
     }
 
-    public void UpdatePersonalInfo(PersonalInfo personalInfo) {
+    public void UpdatePersonalInfo(PersonalInfo personalInfo)
+    {
         PersonalInfo = personalInfo ?? throw new ArgumentNullException(nameof(personalInfo));
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateContactInfo(ContactInfo contactInfo) {
+    public void UpdateContactInfo(ContactInfo contactInfo)
+    {
         ContactInfo = contactInfo ?? throw new ArgumentNullException(nameof(contactInfo));
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void SetProfileImage(string imageUrl) {
+    public void SetProfileImage(string imageUrl)
+    {
         if (string.IsNullOrWhiteSpace(imageUrl))
             throw new ArgumentException("Image URL cannot be empty", nameof(imageUrl));
         ProfileImageUrl = imageUrl;
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void Activate() {
+    public void Activate()
+    {
         Status = UserStatus.Active;
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void Deactivate() {
+    public void Deactivate()
+    {
         Status = UserStatus.Inactive;
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void Suspend(string reason) {
+    public void Suspend(string reason)
+    {
         if (string.IsNullOrWhiteSpace(reason))
             throw new ArgumentException("Suspension reason is required", nameof(reason));
         Status = UserStatus.Suspended;
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void SubscribeTo(SubscriptionPlan plan, DateTime startDate) {
+    public void SubscribeTo(SubscriptionPlan plan, DateTime startDate)
+    {
         if (plan == null) throw new ArgumentNullException(nameof(plan));
 
         var endDate = startDate.AddDays(plan.DurationDays);
-        var subscription = UserSubscription.CreateNew(Guid, plan.Guid, new DateRange(startDate, endDate));
+        var subscription = UserSubscription.CreateNew(Guid, plan.Id, new DateRange(startDate, endDate));
         _subscriptions.Add(subscription);
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public bool HasActiveSubscription() {
+    public bool HasActiveSubscription()
+    {
         return _subscriptions.Any(s => s.IsActive);
     }
 
-    private string GenerateMembershipNumber() {
+    private string GenerateMembershipNumber()
+    {
         return $"MEM{DateTime.UtcNow:yyyyMMdd}{Random.Shared.Next(1000, 9999)}";
     }
 }

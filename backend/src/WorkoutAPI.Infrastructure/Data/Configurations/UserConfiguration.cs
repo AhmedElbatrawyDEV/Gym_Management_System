@@ -1,49 +1,52 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using WorkoutAPI.Domain.Aggregates;
+using WorkoutAPI.Domain.Entities;
 
 namespace WorkoutAPI.Infrastructure.Data.Configurations;
-
-public class UserConfiguration : IEntityTypeConfiguration<User> {
-    public void Configure(EntityTypeBuilder<User> builder) {
+public class UserConfiguration : IEntityTypeConfiguration<User>
+{
+    public void Configure(EntityTypeBuilder<User> builder)
+    {
+        // Table configuration
         builder.ToTable("Users");
 
-        builder.HasKey(u => u.Id);
+        // Primary key
+        builder.HasKey(u => u.Guid);
+        builder.Property(u => u.Guid).ValueGeneratedNever();
 
-        builder.Property(u => u.FirstName)
-            .IsRequired()
-            .HasMaxLength(100);
+        // Properties
+        builder.Property(u => u.ProfileImageUrl).HasMaxLength(500);
+        builder.Property(u => u.Status).IsRequired();
+        builder.Property(u => u.MembershipNumber).HasMaxLength(50).IsRequired();
+        builder.Property(u => u.PreferredLanguage).IsRequired();
+        builder.Property(u => u.CreatedAt).IsRequired();
+        builder.Property(u => u.UpdatedAt).IsRequired();
 
-        builder.Property(u => u.LastName)
-            .IsRequired()
-            .HasMaxLength(100);
+        // Indexes
+        builder.HasIndex(u => u.MembershipNumber).IsUnique();
 
-        builder.Property(u => u.Email)
-            .IsRequired()
-            .HasMaxLength(255);
+        // Value Objects are configured in DbContext
 
-        builder.Property(u => u.PhoneNumber)
-            .HasMaxLength(20);
+        // Navigation properties - Collections
+        builder.HasMany<UserSubscription>()
+            .WithOne()
+            .HasForeignKey(us => us.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Property(u => u.ProfileImageUrl)
-            .HasMaxLength(500);
-
-        builder.Property(u => u.CreatedBy)
-            .HasMaxLength(255);
-
-        builder.Property(u => u.UpdatedBy)
-            .HasMaxLength(255);
-
-        // Relationships
-        builder.HasMany(u => u.WorkoutSessions)
-            .WithOne(ws => ws.User)
+        builder.HasMany<WorkoutSession>()
+            .WithOne()
             .HasForeignKey(ws => ws.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(u => u.UserWorkoutPlans)
-            .WithOne(uwp => uwp.User)
-            .HasForeignKey(uwp => uwp.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        builder.HasMany<Payment>()
+            .WithOne()
+            .HasForeignKey(p => p.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Ignore domain events (handled by base aggregate)
+        builder.Ignore(u => u.UncommittedEvents);
+        builder.Ignore(u => u.IsInitializing);
+        builder.Ignore(u => u.IsNew);
     }
 }
-

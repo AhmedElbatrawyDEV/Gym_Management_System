@@ -1,66 +1,71 @@
 namespace WorkoutAPI.Domain.Events;
 
 
-public class UserRegisteredEvent : IDomainEvent {
-    public Guid EventId { get; } = Guid.NewGuid();
-    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+public class UserRegisteredEvent : DomainEvent
+{
     public Guid UserId { get; }
     public string Email { get; }
 
-    public UserRegisteredEvent(Guid userId, string email) {
+    public UserRegisteredEvent(Guid userId, string email)
+    {
         UserId = userId;
         Email = email;
     }
 }
 
-public class WorkoutSessionCompletedEvent : IDomainEvent {
-    public Guid EventId { get; } = Guid.NewGuid();
-    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+public class WorkoutSessionCompletedEvent : DomainEvent
+{
+ 
     public Guid SessionId { get; }
     public Guid UserId { get; }
     public TimeSpan Duration { get; }
 
-    public WorkoutSessionCompletedEvent(Guid sessionId, Guid userId, TimeSpan duration) {
+    public WorkoutSessionCompletedEvent(Guid sessionId, Guid userId, TimeSpan duration)
+    {
         SessionId = sessionId;
         UserId = userId;
         Duration = duration;
     }
 }
 
-public class PaymentProcessedEvent : IDomainEvent {
-    public Guid EventId { get; } = Guid.NewGuid();
-    public DateTime OccurredOn { get; } = DateTime.UtcNow;
+public class PaymentProcessedEvent : DomainEvent
+{
     public Guid PaymentId { get; }
     public Guid UserId { get; }
     public decimal Amount { get; }
 
-    public PaymentProcessedEvent(Guid paymentId, Guid userId, decimal amount) {
+    public PaymentProcessedEvent(Guid paymentId, Guid userId, decimal amount)
+    {
         PaymentId = paymentId;
         UserId = userId;
         Amount = amount;
     }
 }
 
-public class WorkoutSessionStartedEvent : DomainEvent {
+public class WorkoutSessionStartedEvent : DomainEvent
+{
     public Guid UserId { get; }
     public Guid WorkoutSessionId { get; }
     public Guid WorkoutPlanId { get; }
 
-    public WorkoutSessionStartedEvent(Guid userId, Guid workoutSessionId, Guid workoutPlanId) {
+    public WorkoutSessionStartedEvent(Guid userId, Guid workoutSessionId, Guid workoutPlanId)
+    {
         UserId = userId;
         WorkoutSessionId = workoutSessionId;
         WorkoutPlanId = workoutPlanId;
     }
 }
 
-public class ExerciseCompletedEvent : DomainEvent {
+public class ExerciseCompletedEvent : DomainEvent
+{
     public Guid UserId { get; }
     public Guid WorkoutSessionId { get; }
     public Guid ExerciseId { get; }
     public int CompletedSets { get; }
     public decimal TotalWeight { get; }
 
-    public ExerciseCompletedEvent(Guid userId, Guid workoutSessionId, Guid exerciseId, int completedSets, decimal totalWeight) {
+    public ExerciseCompletedEvent(Guid userId, Guid workoutSessionId, Guid exerciseId, int completedSets, decimal totalWeight)
+    {
         UserId = userId;
         WorkoutSessionId = workoutSessionId;
         ExerciseId = exerciseId;

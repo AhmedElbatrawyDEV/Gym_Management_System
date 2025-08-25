@@ -2,11 +2,12 @@
 // Entities
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class ClassBooking : Entity<ClassBooking, Guid> {
+public class ClassBooking : Entity<ClassBooking, Guid>
+{
     public Guid UserId { get; private set; }
     public Guid ClassScheduleId { get; private set; }
     public DateTime BookingDate { get; private set; }
@@ -18,8 +19,10 @@ public class ClassBooking : Entity<ClassBooking, Guid> {
 
     private ClassBooking() { } // EF Core
 
-    public static ClassBooking CreateNew(Guid userId, Guid classScheduleId) {
-        return new ClassBooking {
+    public static ClassBooking CreateNew(Guid userId, Guid classScheduleId)
+    {
+        return new ClassBooking
+        {
             Id = Guid.NewGuid(),
             UserId = userId,
             ClassScheduleId = classScheduleId,
@@ -28,39 +31,45 @@ public class ClassBooking : Entity<ClassBooking, Guid> {
         };
     }
 
-    public void Cancel() {
+    public void Cancel()
+    {
         if (Status == BookingStatus.Completed)
             throw new InvalidOperationException("Cannot cancel completed booking");
 
         Status = BookingStatus.Cancelled;
     }
 
-    public void CheckIn() {
+    public void CheckIn()
+    {
         if (Status != BookingStatus.Confirmed)
             throw new InvalidOperationException("Can only check in confirmed bookings");
 
         Status = BookingStatus.CheckedIn;
     }
 
-    public void MarkAsNoShow() {
+    public void MarkAsNoShow()
+    {
         if (Status != BookingStatus.Confirmed)
             throw new InvalidOperationException("Can only mark confirmed bookings as no-show");
 
         Status = BookingStatus.NoShow;
     }
 
-    public void Complete() {
+    public void Complete()
+    {
         if (Status != BookingStatus.CheckedIn)
             throw new InvalidOperationException("Can only complete checked-in bookings");
 
         Status = BookingStatus.Completed;
     }
 
-    public void Waitlist() {
+    public void Waitlist()
+    {
         Status = BookingStatus.Waitlisted;
     }
 
-    public void Confirm() {
+    public void Confirm()
+    {
         if (Status != BookingStatus.Waitlisted && Status != BookingStatus.Pending)
             throw new InvalidOperationException("Can only confirm waitlisted or pending bookings");
 

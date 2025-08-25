@@ -1,11 +1,12 @@
 
 // Entities
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Exercise : Entity<Exercise, Guid> {
+public class Exercise : Entity<Exercise, Guid>
+{
     private readonly List<ExerciseTranslation> _translations = new();
 
     public string Code { get; private set; } = string.Empty;
@@ -22,8 +23,10 @@ public class Exercise : Entity<Exercise, Guid> {
 
     public static Exercise CreateNew(string code, ExerciseType type, MuscleGroup primaryMuscleGroup,
                                    DifficultyLevel difficulty, MuscleGroup? secondaryMuscleGroup = null,
-                                   string? iconName = null) {
-        return new Exercise {
+                                   string? iconName = null)
+    {
+        return new Exercise
+        {
             Id = Guid.NewGuid(),
             Code = code ?? throw new ArgumentNullException(nameof(code)),
             Type = type,
@@ -34,7 +37,8 @@ public class Exercise : Entity<Exercise, Guid> {
         };
     }
 
-    public void AddTranslation(Language language, string name, string? description = null, string? instructions = null) {
+    public void AddTranslation(Language language, string name, string? description = null, string? instructions = null)
+    {
         if (_translations.Any(t => t.Language == language))
             throw new InvalidOperationException($"Translation for {language} already exists");
 

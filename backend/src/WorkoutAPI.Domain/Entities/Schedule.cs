@@ -4,7 +4,8 @@ using WorkoutAPI.Domain.Common;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Schedule : Entity<Schedule, Guid> {
+public class Schedule : Entity<Schedule, Guid>
+{
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public DateTime StartTime { get; private set; }
@@ -21,8 +22,10 @@ public class Schedule : Entity<Schedule, Guid> {
     private Schedule() { } // EF Core
 
     public static Schedule CreateNew(string title, string description, DateTime startTime,
-                                   DateTime endTime, int capacity, Guid? trainerId = null, Guid? workoutPlanId = null) {
-        return new Schedule {
+                                   DateTime endTime, int capacity, Guid? trainerId = null, Guid? workoutPlanId = null)
+    {
+        return new Schedule
+        {
             Id = Guid.NewGuid(),
             Title = title ?? throw new ArgumentNullException(nameof(title)),
             Description = description ?? throw new ArgumentNullException(nameof(description)),
@@ -35,26 +38,30 @@ public class Schedule : Entity<Schedule, Guid> {
         };
     }
 
-    public void Enroll() {
+    public void Enroll()
+    {
         if (EnrolledCount >= Capacity)
             throw new InvalidOperationException("Schedule is at full capacity");
 
         EnrolledCount++;
     }
 
-    public void Unenroll() {
+    public void Unenroll()
+    {
         if (EnrolledCount <= 0)
             throw new InvalidOperationException("No one to unenroll");
 
         EnrolledCount--;
     }
 
-    public void UpdateDetails(string title, string description) {
+    public void UpdateDetails(string title, string description)
+    {
         Title = title ?? throw new ArgumentNullException(nameof(title));
         Description = description ?? throw new ArgumentNullException(nameof(description));
     }
 
-    public void UpdateTiming(DateTime startTime, DateTime endTime) {
+    public void UpdateTiming(DateTime startTime, DateTime endTime)
+    {
         if (endTime <= startTime)
             throw new ArgumentException("End time must be after start time");
 
@@ -62,19 +69,23 @@ public class Schedule : Entity<Schedule, Guid> {
         EndTime = endTime;
     }
 
-    public void AssignTrainer(Guid trainerId) {
+    public void AssignTrainer(Guid trainerId)
+    {
         TrainerId = trainerId;
     }
 
-    public void RemoveTrainer() {
+    public void RemoveTrainer()
+    {
         TrainerId = null;
     }
 
-    public void AssignWorkoutPlan(Guid workoutPlanId) {
+    public void AssignWorkoutPlan(Guid workoutPlanId)
+    {
         WorkoutPlanId = workoutPlanId;
     }
 
-    public void RemoveWorkoutPlan() {
+    public void RemoveWorkoutPlan()
+    {
         WorkoutPlanId = null;
     }
 

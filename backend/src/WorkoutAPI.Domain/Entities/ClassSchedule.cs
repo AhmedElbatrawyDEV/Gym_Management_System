@@ -1,11 +1,12 @@
 
 // Entities
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class ClassSchedule : Entity<ClassSchedule, Guid> {
+public class ClassSchedule : Entity<ClassSchedule, Guid>
+{
     public Guid GymClassId { get; private set; }
     public DateTime StartTime { get; private set; }
     public DateTime EndTime { get; private set; }
@@ -19,8 +20,10 @@ public class ClassSchedule : Entity<ClassSchedule, Guid> {
 
     private ClassSchedule() { } // EF Core
 
-    public static ClassSchedule CreateNew(Guid gymClassId, DateTime startTime, DateTime endTime, int maxCapacity) {
-        return new ClassSchedule {
+    public static ClassSchedule CreateNew(Guid gymClassId, DateTime startTime, DateTime endTime, int maxCapacity)
+    {
+        return new ClassSchedule
+        {
             Id = Guid.NewGuid(),
             GymClassId = gymClassId,
             StartTime = startTime,
@@ -31,7 +34,8 @@ public class ClassSchedule : Entity<ClassSchedule, Guid> {
         };
     }
 
-    public void EnrollMember() {
+    public void EnrollMember()
+    {
         if (CurrentEnrollment >= MaxCapacity)
             throw new InvalidOperationException("Class is at full capacity");
 
@@ -41,7 +45,8 @@ public class ClassSchedule : Entity<ClassSchedule, Guid> {
             Status = ClassStatus.Full;
     }
 
-    public void UnenrollMember() {
+    public void UnenrollMember()
+    {
         if (CurrentEnrollment <= 0)
             throw new InvalidOperationException("No members to unenroll");
 
@@ -51,21 +56,24 @@ public class ClassSchedule : Entity<ClassSchedule, Guid> {
             Status = ClassStatus.Scheduled;
     }
 
-    public void StartClass() {
+    public void StartClass()
+    {
         if (Status != ClassStatus.Scheduled)
             throw new InvalidOperationException("Can only start scheduled classes");
 
         Status = ClassStatus.InProgress;
     }
 
-    public void CompleteClass() {
+    public void CompleteClass()
+    {
         if (Status != ClassStatus.InProgress)
             throw new InvalidOperationException("Can only complete classes in progress");
 
         Status = ClassStatus.Completed;
     }
 
-    public void CancelClass() {
+    public void CancelClass()
+    {
         if (Status == ClassStatus.Completed)
             throw new InvalidOperationException("Cannot cancel completed class");
 

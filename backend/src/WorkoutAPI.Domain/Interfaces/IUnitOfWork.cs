@@ -2,7 +2,8 @@ using System.Data;
 
 namespace WorkoutAPI.Domain.Interfaces;
 
-public interface IUnitOfWork {
+public interface IUnitOfWork
+{
     [Obsolete("Please use the BeginAsync version")]
     void Begin();
 

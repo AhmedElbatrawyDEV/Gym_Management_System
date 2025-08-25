@@ -4,7 +4,8 @@ using WorkoutAPI.Domain.Common;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Translation : Entity<Translation, Guid> {
+public class Translation : Entity<Translation, Guid>
+{
     public string EntityType { get; private set; } = string.Empty;
     public Guid EntityId { get; private set; }
     public string Culture { get; private set; } = "en";
@@ -13,8 +14,10 @@ public class Translation : Entity<Translation, Guid> {
 
     private Translation() { } // EF Core
 
-    public static Translation CreateNew(string entityType, Guid entityId, string culture, string field, string value) {
-        return new Translation {
+    public static Translation CreateNew(string entityType, Guid entityId, string culture, string field, string value)
+    {
+        return new Translation
+        {
             Id = Guid.NewGuid(),
             EntityType = entityType ?? throw new ArgumentNullException(nameof(entityType)),
             EntityId = entityId,
@@ -24,7 +27,8 @@ public class Translation : Entity<Translation, Guid> {
         };
     }
 
-    public void UpdateValue(string newValue) {
+    public void UpdateValue(string newValue)
+    {
         Value = newValue ?? throw new ArgumentNullException(nameof(newValue));
     }
 }

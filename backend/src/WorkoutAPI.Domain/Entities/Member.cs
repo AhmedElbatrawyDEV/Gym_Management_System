@@ -2,11 +2,12 @@
 // Entities
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Member : Entity<Member, Guid> {
+public class Member : Entity<Member, Guid>
+{
     public Guid UserId { get; private set; }
     public DateTime MembershipStartDate { get; private set; }
     public DateTime MembershipEndDate { get; private set; }
@@ -20,8 +21,10 @@ public class Member : Entity<Member, Guid> {
 
     private Member() { } // EF Core
 
-    public static Member CreateNew(Guid userId, MembershipType membershipType, DateTime startDate, DateTime endDate) {
-        return new Member {
+    public static Member CreateNew(Guid userId, MembershipType membershipType, DateTime startDate, DateTime endDate)
+    {
+        return new Member
+        {
             Id = Guid.NewGuid(),
             UserId = userId,
             MembershipType = membershipType,
@@ -31,7 +34,8 @@ public class Member : Entity<Member, Guid> {
         };
     }
 
-    public void ExtendMembership(DateTime newEndDate) {
+    public void ExtendMembership(DateTime newEndDate)
+    {
         if (newEndDate <= MembershipEndDate)
             throw new ArgumentException("New end date must be after current end date");
 
@@ -42,11 +46,13 @@ public class Member : Entity<Member, Guid> {
         }
     }
 
-    public void Deactivate() {
+    public void Deactivate()
+    {
         IsActiveMember = false;
     }
 
-    public void Reactivate() {
+    public void Reactivate()
+    {
         if (DateTime.UtcNow <= MembershipEndDate)
         {
             IsActiveMember = true;
@@ -57,7 +63,8 @@ public class Member : Entity<Member, Guid> {
         }
     }
 
-    public void ChangeMembershipType(MembershipType newType) {
+    public void ChangeMembershipType(MembershipType newType)
+    {
         MembershipType = newType;
     }
 

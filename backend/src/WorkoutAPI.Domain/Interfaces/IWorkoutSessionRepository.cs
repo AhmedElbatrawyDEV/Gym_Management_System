@@ -2,7 +2,8 @@ using WorkoutAPI.Domain.Aggregates;
 
 namespace WorkoutAPI.Domain.Interfaces;
 
-public interface IWorkoutSessionRepository : IRepository<WorkoutSession> {
+public interface IWorkoutSessionRepository : IRepository<WorkoutSession>
+{
     Task<IEnumerable<WorkoutSession>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkoutSession>> GetByTrainerIdAsync(Guid trainerId, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkoutSession>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);

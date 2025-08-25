@@ -2,11 +2,12 @@
 // Entities
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class Invoice : Entity<Invoice, Guid> {
+public class Invoice : Entity<Invoice, Guid>
+{
     public Guid UserId { get; private set; }
     public Guid PaymentId { get; private set; }
     public string InvoiceNumber { get; private set; } = string.Empty;
@@ -23,11 +24,13 @@ public class Invoice : Entity<Invoice, Guid> {
 
     private Invoice() { } // EF Core
 
-    public static Invoice CreateNew(Guid userId, Guid paymentId, decimal amount, decimal taxAmount) {
+    public static Invoice CreateNew(Guid userId, Guid paymentId, decimal amount, decimal taxAmount)
+    {
         var totalAmount = amount + taxAmount;
         var invoiceNumber = GenerateInvoiceNumber();
 
-        return new Invoice {
+        return new Invoice
+        {
             Id = Guid.NewGuid(),
             UserId = userId,
             PaymentId = paymentId,
@@ -40,19 +43,22 @@ public class Invoice : Entity<Invoice, Guid> {
         };
     }
 
-    public void Send() {
+    public void Send()
+    {
         if (Status != InvoiceStatus.Draft)
             throw new InvalidOperationException("Can only send draft invoices");
 
         Status = InvoiceStatus.Sent;
     }
 
-    public void MarkAsViewed() {
+    public void MarkAsViewed()
+    {
         if (Status == InvoiceStatus.Sent)
             Status = InvoiceStatus.Viewed;
     }
 
-    public void MarkAsPaid() {
+    public void MarkAsPaid()
+    {
         if (Status != InvoiceStatus.Sent && Status != InvoiceStatus.Viewed && Status != InvoiceStatus.Overdue)
             throw new InvalidOperationException("Invalid invoice status for payment");
 
@@ -60,33 +66,38 @@ public class Invoice : Entity<Invoice, Guid> {
         PaidAt = DateTime.UtcNow;
     }
 
-    public void MarkAsOverdue() {
+    public void MarkAsOverdue()
+    {
         if (Status == InvoiceStatus.Sent || Status == InvoiceStatus.Viewed)
             Status = InvoiceStatus.Overdue;
     }
 
-    public void Cancel() {
+    public void Cancel()
+    {
         if (Status == InvoiceStatus.Paid)
             throw new InvalidOperationException("Cannot cancel paid invoice");
 
         Status = InvoiceStatus.Cancelled;
     }
 
-    public void Refund() {
+    public void Refund()
+    {
         if (Status != InvoiceStatus.Paid)
             throw new InvalidOperationException("Can only refund paid invoices");
 
         Status = InvoiceStatus.Refunded;
     }
 
-    public void PartialPayment() {
+    public void PartialPayment()
+    {
         if (Status != InvoiceStatus.Sent && Status != InvoiceStatus.Viewed && Status != InvoiceStatus.Overdue)
             throw new InvalidOperationException("Invalid invoice status for partial payment");
 
         Status = InvoiceStatus.PartiallyPaid;
     }
 
-    private static string GenerateInvoiceNumber() {
+    private static string GenerateInvoiceNumber()
+    {
         return $"INV{DateTime.UtcNow:yyyyMMdd}{Random.Shared.Next(1000, 9999)}";
     }
 }

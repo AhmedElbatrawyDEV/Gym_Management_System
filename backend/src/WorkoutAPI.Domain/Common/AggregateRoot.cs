@@ -3,7 +3,8 @@ using System.ComponentModel;
 using WorkoutAPI.Domain.Events;
 
 namespace WorkoutAPI.Domain.Common;
-public interface IAggregateRoot : ISupportInitialize {
+public interface IAggregateRoot : ISupportInitialize
+{
     Guid Guid { get; }
 
     IEnumerable<IDomainEvent> UncommittedEvents { get; }
@@ -22,9 +23,12 @@ public interface IAggregateRoot : ISupportInitialize {
 
     bool IsEventAdded(IDomainEvent domainEvent);
 }
-public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitialize where TAggregate : AggregateRoot<TAggregate>, new() {
-    protected static class BaseFactory {
-        public static TAggregate Create() {
+public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitialize where TAggregate : AggregateRoot<TAggregate>, new()
+{
+    protected static class BaseFactory
+    {
+        public static TAggregate Create()
+        {
             TAggregate val = new TAggregate();
             val.BeginInit();
             val.Guid = Guid.NewGuid();
@@ -44,11 +48,13 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
 
     public bool IsNew => IsEventAdded<AggregateCreatedEvent<TAggregate>>();
 
-    protected AggregateRoot() {
+    protected AggregateRoot()
+    {
         _UncommittedEvents = new Collection<IDomainEvent>();
     }
 
-    public void AddEvent(IDomainEvent domainEvent, bool enforceWhileInitialization = false) {
+    public void AddEvent(IDomainEvent domainEvent, bool enforceWhileInitialization = false)
+    {
         ArgumentNullException.ThrowIfNull(domainEvent, "domainEvent");
         if (!IsInitializing || enforceWhileInitialization)
         {
@@ -56,7 +62,8 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
         }
     }
 
-    public void AddEvents(IEnumerable<IDomainEvent> domainEvents, bool enforceWhileInitialization = false) {
+    public void AddEvents(IEnumerable<IDomainEvent> domainEvents, bool enforceWhileInitialization = false)
+    {
         ArgumentNullException.ThrowIfNull(domainEvents, "domainEvents");
         if (!(!IsInitializing || enforceWhileInitialization))
         {
@@ -69,11 +76,13 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
         }
     }
 
-    public void ClearDomainEvents() {
+    public void ClearDomainEvents()
+    {
         _UncommittedEvents.Clear();
     }
 
-    public bool IsEventAdded<TEvent>() where TEvent : IDomainEvent {
+    public bool IsEventAdded<TEvent>() where TEvent : IDomainEvent
+    {
         if (_UncommittedEvents == null || _UncommittedEvents.Count == 0)
         {
             return false;
@@ -82,7 +91,8 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
         return _UncommittedEvents.OfType<TEvent>().Any();
     }
 
-    public bool IsEventAdded(IDomainEvent domainEvent) {
+    public bool IsEventAdded(IDomainEvent domainEvent)
+    {
         if (_UncommittedEvents == null || _UncommittedEvents.Count == 0)
         {
             return false;
@@ -91,11 +101,13 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
         return _UncommittedEvents.Any((IDomainEvent e) => object.Equals(e, domainEvent));
     }
 
-    public virtual void BeginInit() {
+    public virtual void BeginInit()
+    {
         IsInitializing = true;
     }
 
-    public virtual void EndInit() {
+    public virtual void EndInit()
+    {
         IsInitializing = false;
     }
 }

@@ -4,7 +4,8 @@ using WorkoutAPI.Domain.Enums;
 namespace WorkoutAPI.Domain.ValueObjects;
 
 // Value Objects
-public class PersonalInfo : ValueObject {
+public class PersonalInfo : ValueObject
+{
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public DateTime DateOfBirth { get; private set; }
@@ -12,7 +13,8 @@ public class PersonalInfo : ValueObject {
 
     private PersonalInfo() { } // EF Core
 
-    public PersonalInfo(string firstName, string lastName, DateTime dateOfBirth, Gender gender) {
+    public PersonalInfo(string firstName, string lastName, DateTime dateOfBirth, Gender gender)
+    {
         if (string.IsNullOrWhiteSpace(firstName))
             throw new ArgumentException("First name cannot be empty", nameof(firstName));
         if (string.IsNullOrWhiteSpace(lastName))
@@ -30,7 +32,8 @@ public class PersonalInfo : ValueObject {
     public int Age => DateTime.UtcNow.Year - DateOfBirth.Year -
                      (DateTime.UtcNow.DayOfYear < DateOfBirth.DayOfYear ? 1 : 0);
 
-    protected override IEnumerable<object> GetEqualityComponents() {
+    protected override IEnumerable<object> GetEqualityComponents()
+    {
         yield return FirstName.ToLowerInvariant();
         yield return LastName.ToLowerInvariant();
         yield return DateOfBirth;

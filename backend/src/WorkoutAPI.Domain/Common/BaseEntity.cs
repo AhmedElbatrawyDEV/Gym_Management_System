@@ -2,12 +2,15 @@ using KellermanSoftware.CompareNetObjects;
 
 namespace WorkoutAPI.Domain.Common;
 
-public interface IEntity<TId> {
+public interface IEntity<TId>
+{
     TId Id { get; set; }
 }
 
-public abstract class Entity<TEntity, TId> : IEntity<TId> where TEntity : Entity<TEntity, TId> {
-    private static readonly CompareLogic Compare = new CompareLogic(new ComparisonConfig {
+public abstract class Entity<TEntity, TId> : IEntity<TId> where TEntity : Entity<TEntity, TId>
+{
+    private static readonly CompareLogic Compare = new CompareLogic(new ComparisonConfig
+    {
         CompareChildren = true
     });
 
@@ -15,11 +18,13 @@ public abstract class Entity<TEntity, TId> : IEntity<TId> where TEntity : Entity
 
     public TId Id { get; set; }
 
-    public static bool operator !=(Entity<TEntity, TId> entity1, Entity<TEntity, TId> entity2) {
+    public static bool operator !=(Entity<TEntity, TId> entity1, Entity<TEntity, TId> entity2)
+    {
         return !(entity1 == entity2);
     }
 
-    public static bool operator ==(Entity<TEntity, TId> entity1, Entity<TEntity, TId> entity2) {
+    public static bool operator ==(Entity<TEntity, TId> entity1, Entity<TEntity, TId> entity2)
+    {
         if ((object)entity1 == entity2)
         {
             return true;
@@ -38,7 +43,8 @@ public abstract class Entity<TEntity, TId> : IEntity<TId> where TEntity : Entity
         return entity1.Equals(entity2);
     }
 
-    public override bool Equals(object obj) {
+    public override bool Equals(object obj)
+    {
         if (obj is TEntity val)
         {
             bool num = Id.Equals(default(TId));
@@ -59,7 +65,8 @@ public abstract class Entity<TEntity, TId> : IEntity<TId> where TEntity : Entity
         return false;
     }
 
-    public override int GetHashCode() {
+    public override int GetHashCode()
+    {
         if (_hashCode.HasValue)
         {
             return _hashCode.Value;
@@ -74,7 +81,8 @@ public abstract class Entity<TEntity, TId> : IEntity<TId> where TEntity : Entity
         return Id.GetHashCode();
     }
 
-    private bool DeepEquals<T>(T thisObject, T otherObj) {
+    private bool DeepEquals<T>(T thisObject, T otherObj)
+    {
         return Compare.Compare(thisObject, otherObj).AreEqual;
     }
 }

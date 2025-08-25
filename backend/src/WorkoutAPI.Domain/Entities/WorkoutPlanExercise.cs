@@ -4,7 +4,8 @@ using WorkoutAPI.Domain.Common;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class WorkoutPlanExercise : Entity<WorkoutPlanExercise, Guid> {
+public class WorkoutPlanExercise : Entity<WorkoutPlanExercise, Guid>
+{
     public Guid WorkoutPlanId { get; private set; }
     public Guid ExerciseId { get; private set; }
     public int Day { get; private set; }
@@ -24,8 +25,10 @@ public class WorkoutPlanExercise : Entity<WorkoutPlanExercise, Guid> {
 
     public static WorkoutPlanExercise CreateNew(Guid workoutPlanId, Guid exerciseId, int day, int order, int sets,
                                               int? reps = null, decimal? weight = null, TimeSpan? duration = null,
-                                              TimeSpan? restTime = null, string? notes = null) {
-        return new WorkoutPlanExercise {
+                                              TimeSpan? restTime = null, string? notes = null)
+    {
+        return new WorkoutPlanExercise
+        {
             Id = Guid.NewGuid(),
             WorkoutPlanId = workoutPlanId,
             ExerciseId = exerciseId,
@@ -40,14 +43,16 @@ public class WorkoutPlanExercise : Entity<WorkoutPlanExercise, Guid> {
         };
     }
 
-    public void UpdateSets(int sets, int? reps = null, decimal? weight = null, TimeSpan? duration = null) {
+    public void UpdateSets(int sets, int? reps = null, decimal? weight = null, TimeSpan? duration = null)
+    {
         Sets = sets > 0 ? sets : throw new ArgumentException("Sets must be positive");
         Reps = reps;
         Weight = weight;
         Duration = duration;
     }
 
-    public void UpdateNotes(string? notes) {
+    public void UpdateNotes(string? notes)
+    {
         Notes = notes;
     }
 }

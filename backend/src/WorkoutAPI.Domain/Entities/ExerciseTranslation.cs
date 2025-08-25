@@ -1,11 +1,12 @@
 
 // Entities
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class ExerciseTranslation : Entity<ExerciseTranslation, Guid> {
+public class ExerciseTranslation : Entity<ExerciseTranslation, Guid>
+{
     public Guid ExerciseId { get; private set; }
     public Language Language { get; private set; }
     public string Name { get; private set; } = string.Empty;
@@ -15,8 +16,10 @@ public class ExerciseTranslation : Entity<ExerciseTranslation, Guid> {
     private ExerciseTranslation() { } // EF Core
 
     public static ExerciseTranslation CreateNew(Guid exerciseId, Language language, string name,
-                                              string? description = null, string? instructions = null) {
-        return new ExerciseTranslation {
+                                              string? description = null, string? instructions = null)
+    {
+        return new ExerciseTranslation
+        {
             Id = Guid.NewGuid(),
             ExerciseId = exerciseId,
             Language = language,

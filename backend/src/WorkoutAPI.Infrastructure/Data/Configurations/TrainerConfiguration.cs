@@ -1,42 +1,38 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Entities;
 
 namespace WorkoutAPI.Infrastructure.Data.Configurations;
 
-public class TrainerConfiguration : IEntityTypeConfiguration<Trainer> {
-    public void Configure(EntityTypeBuilder<Trainer> builder) {
+public class TrainerConfiguration : IEntityTypeConfiguration<Trainer>
+{
+    public void Configure(EntityTypeBuilder<Trainer> builder)
+    {
+        // Table configuration
         builder.ToTable("Trainers");
 
+        // Primary key
         builder.HasKey(t => t.Id);
+        builder.Property(t => t.Id).ValueGeneratedNever();
 
-        builder.Property(t => t.Specialization)
-            .IsRequired()
-            .HasMaxLength(255);
+        // Properties
+        builder.Property(t => t.UserId).IsRequired();
+        builder.Property(t => t.Specialization).HasMaxLength(200).IsRequired();
+        builder.Property(t => t.Certification).HasMaxLength(500).IsRequired();
+        builder.Property(t => t.IsAvailable).IsRequired().HasDefaultValue(true);
 
-        builder.Property(t => t.Certification)
-            .IsRequired()
-            .HasMaxLength(255);
+        // Indexes
+        builder.HasIndex(t => t.UserId).IsUnique();
+        builder.HasIndex(t => t.Specialization);
+        builder.HasIndex(t => t.IsAvailable);
 
-        builder.Property(t => t.HourlyRate)
-            .HasPrecision(18, 2);
-
-        builder.Property(t => t.CreatedBy)
-            .HasMaxLength(255);
-
-        builder.Property(t => t.UpdatedBy)
-            .HasMaxLength(255);
-
-        // Relationships
-        builder.HasOne(t => t.User)
-            .WithOne()
-            .HasForeignKey<Trainer>(t => t.UserId)
+        // Foreign key relationships
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(t => t.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(t => t.ScheduledSessions)
-            .WithOne(ws => ws.Trainer)
-            .HasForeignKey(ws => ws.TrainerId)
-            .OnDelete(DeleteBehavior.SetNull);
     }
 }
 
+// =====

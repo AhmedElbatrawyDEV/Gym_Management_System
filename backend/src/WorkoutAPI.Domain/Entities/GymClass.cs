@@ -2,11 +2,12 @@
 // Entities
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class GymClass : Entity<GymClass, Guid> {
+public class GymClass : Entity<GymClass, Guid>
+{
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public Guid? InstructorId { get; private set; }
@@ -22,8 +23,10 @@ public class GymClass : Entity<GymClass, Guid> {
     private GymClass() { } // EF Core
 
     public static GymClass CreateNew(string name, string description, int maxCapacity,
-                                   TimeSpan duration, DifficultyLevel difficulty, Guid? instructorId = null) {
-        return new GymClass {
+                                   TimeSpan duration, DifficultyLevel difficulty, Guid? instructorId = null)
+    {
+        return new GymClass
+        {
             Id = Guid.NewGuid(),
             Name = name ?? throw new ArgumentNullException(nameof(name)),
             Description = description ?? throw new ArgumentNullException(nameof(description)),
@@ -34,18 +37,21 @@ public class GymClass : Entity<GymClass, Guid> {
         };
     }
 
-    public void UpdateDetails(string name, string description, int maxCapacity, TimeSpan duration) {
+    public void UpdateDetails(string name, string description, int maxCapacity, TimeSpan duration)
+    {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Description = description ?? throw new ArgumentNullException(nameof(description));
         MaxCapacity = maxCapacity > 0 ? maxCapacity : throw new ArgumentException("Max capacity must be positive");
         Duration = duration;
     }
 
-    public void AssignInstructor(Guid instructorId) {
+    public void AssignInstructor(Guid instructorId)
+    {
         InstructorId = instructorId;
     }
 
-    public void RemoveInstructor() {
+    public void RemoveInstructor()
+    {
         InstructorId = null;
     }
 

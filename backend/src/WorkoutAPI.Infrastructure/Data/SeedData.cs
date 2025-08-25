@@ -1,380 +1,335 @@
+
+using global::WorkoutAPI.Domain.ValueObjects;
+
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Entities;
 using WorkoutAPI.Domain.Enums;
 
+
 namespace WorkoutAPI.Infrastructure.Data;
 
-public static class SeedData {
-    public static async Task SeedAsync(WorkoutDbContext context) {
-        // Check if data already exists
-        if (await context.Users.AnyAsync() || await context.Exercises.AnyAsync())
+
+public static class DatabaseSeeder
+{
+    public static async Task SeedAsync(WorkoutDbContext context)
+    {
+        try
         {
-            return; // Database has been seeded
+            await SeedSubscriptionPlansAsync(context);
+            await SeedExercisesAsync(context);
+            await SeedUsersAsync(context);
+            await SeedTrainersAsync(context);
+            await SeedGymClassesAsync(context);
+
+            await context.SaveChangesAsync();
         }
-
-        // Seed Users
-        await SeedUsers(context);
-
-        // Seed Exercises
-        await SeedExercises(context);
-
-        // Seed Workout Plans
-        await SeedWorkoutPlans(context);
-
-        // Seed User Workout Plans
-        await SeedUserWorkoutPlans(context);
-
-        await context.SaveChangesAsync();
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Failed to seed database", ex);
+        }
     }
 
-    private static async Task SeedUsers(WorkoutDbContext context) {
-        var users = new List<User>
+    private static async Task SeedSubscriptionPlansAsync(WorkoutDbContext context)
+    {
+        if (await context.SubscriptionPlans.AnyAsync()) return;
+
+        var subscriptionPlans = new[]
         {
-            new User
-            {
-                FirstName = "أحمد",
-                LastName = "محمد",
-                Email = "ahmed.mohamed@example.com",
-                PhoneNumber = "+201234567890",
-                DateOfBirth = new DateTime(1990, 5, 15),
-                Gender = Gender.Male,
-                IsActive = true
-            },
-            new User
-            {
-                FirstName = "فاطمة",
-                LastName = "علي",
-                Email = "fatima.ali@example.com",
-                PhoneNumber = "+201234567891",
-                DateOfBirth = new DateTime(1992, 8, 22),
-                Gender = Gender.Female,
-                IsActive = true
-            },
-            new User
-            {
-                FirstName = "محمد",
-                LastName = "أحمد",
-                Email = "mohamed.ahmed@example.com",
-                PhoneNumber = "+201234567892",
-                DateOfBirth = new DateTime(1988, 12, 10),
-                Gender = Gender.Male,
-                IsActive = true
-            },
-            new User
-            {
-                FirstName = "عائشة",
-                LastName = "حسن",
-                Email = "aisha.hassan@example.com",
-                PhoneNumber = "+201234567893",
-                DateOfBirth = new DateTime(1995, 3, 8),
-                Gender = Gender.Female,
-                IsActive = true
-            },
-            new User
-            {
-                FirstName = "خالد",
-                LastName = "عبدالله",
-                Email = "khalid.abdullah@example.com",
-                PhoneNumber = "+201234567894",
-                DateOfBirth = new DateTime(1985, 7, 30),
-                Gender = Gender.Male,
-                IsActive = true
-            }
+            SubscriptionPlan.CreateNew(
+                "Basic Monthly",
+                "Access to gym equipment and basic facilities",
+                new Money(199, "SAR"),
+                30,
+                new List<string> { "Gym Access", "Basic Equipment", "Locker Room" }),
+
+            SubscriptionPlan.CreateNew(
+                "Standard Monthly",
+                "Gym access plus group classes and swimming pool",
+                new Money(299, "SAR"),
+                30,
+                new List<string> { "Gym Access", "Group Classes", "Swimming Pool", "Locker Room", "Towel Service" }),
+
+            SubscriptionPlan.CreateNew(
+                "Premium Monthly",
+                "Full access including personal training sessions",
+                new Money(599, "SAR"),
+                30,
+                new List<string> { "Gym Access", "Group Classes", "Swimming Pool", "Personal Training", "Nutritionist Consultation", "Sauna & Steam Room" }),
+
+            SubscriptionPlan.CreateNew(
+                "Annual Basic",
+                "Basic annual membership with discount",
+                new Money(1999, "SAR"),
+                365,
+                new List<string> { "Gym Access", "Basic Equipment", "Locker Room", "Annual Discount" }),
+
+            SubscriptionPlan.CreateNew(
+                "Student Monthly",
+                "Special rate for students with valid ID",
+                new Money(149, "SAR"),
+                30,
+                new List<string> { "Gym Access", "Basic Equipment", "Study Area", "Student Discount" }),
+
+            SubscriptionPlan.CreateNew(
+                "Corporate Package",
+                "Special corporate rates for companies",
+                new Money(4999, "SAR"),
+                30,
+                new List<string> { "Multiple Memberships", "Corporate Wellness Programs", "Flexible Hours", "Health Assessments" })
+        };
+
+        await context.SubscriptionPlans.AddRangeAsync(subscriptionPlans);
+    }
+
+    private static async Task SeedExercisesAsync(WorkoutDbContext context)
+    {
+        if (await context.Exercises.AnyAsync()) return;
+
+        var exercises = new[]
+        {
+            // Chest Exercises
+            CreateExercise("BENCH_PRESS", ExerciseType.Strength, MuscleGroup.Chest, DifficultyLevel.Intermediate, MuscleGroup.Shoulders, "bench"),
+            CreateExercise("INCLINE_PRESS", ExerciseType.Strength, MuscleGroup.Chest, DifficultyLevel.Intermediate, MuscleGroup.Shoulders, "incline"),
+            CreateExercise("PUSHUP", ExerciseType.Strength, MuscleGroup.Chest, DifficultyLevel.Beginner, MuscleGroup.Triceps, "pushup"),
+            CreateExercise("CHEST_FLY", ExerciseType.Strength, MuscleGroup.Chest, DifficultyLevel.Beginner, null, "fly"),
+            CreateExercise("DIPS", ExerciseType.Strength, MuscleGroup.Chest, DifficultyLevel.Intermediate, MuscleGroup.Triceps, "dips"),
+
+            // Back Exercises
+            CreateExercise("PULL_UP", ExerciseType.Strength, MuscleGroup.Back, DifficultyLevel.Advanced, MuscleGroup.Biceps, "pullup"),
+            CreateExercise("LAT_PULLDOWN", ExerciseType.Strength, MuscleGroup.Back, DifficultyLevel.Beginner, MuscleGroup.Biceps, "lat"),
+            CreateExercise("BENT_ROW", ExerciseType.Strength, MuscleGroup.Back, DifficultyLevel.Intermediate, MuscleGroup.Biceps, "row"),
+            CreateExercise("DEADLIFT", ExerciseType.Strength, MuscleGroup.Back, DifficultyLevel.Advanced, MuscleGroup.Glutes, "deadlift"),
+            CreateExercise("T_BAR_ROW", ExerciseType.Strength, MuscleGroup.Back, DifficultyLevel.Intermediate, MuscleGroup.Biceps, "tbar"),
+
+            // Shoulder Exercises
+            CreateExercise("SHOULDER_PRESS", ExerciseType.Strength, MuscleGroup.Shoulders, DifficultyLevel.Beginner, MuscleGroup.Triceps, "press"),
+            CreateExercise("LATERAL_RAISE", ExerciseType.Strength, MuscleGroup.Shoulders, DifficultyLevel.Beginner, null, "lateral"),
+            CreateExercise("REAR_DELT_FLY", ExerciseType.Strength, MuscleGroup.Shoulders, DifficultyLevel.Beginner, null, "reardelt"),
+            CreateExercise("UPRIGHT_ROW", ExerciseType.Strength, MuscleGroup.Shoulders, DifficultyLevel.Intermediate, MuscleGroup.Biceps, "upright"),
+
+            // Arm Exercises
+            CreateExercise("BICEP_CURL", ExerciseType.Strength, MuscleGroup.Biceps, DifficultyLevel.Beginner, null, "curl"),
+            CreateExercise("HAMMER_CURL", ExerciseType.Strength, MuscleGroup.Biceps, DifficultyLevel.Beginner, null, "hammer"),
+            CreateExercise("TRICEP_EXTENSION", ExerciseType.Strength, MuscleGroup.Triceps, DifficultyLevel.Beginner, null, "extension"),
+            CreateExercise("TRICEP_PUSHDOWN", ExerciseType.Strength, MuscleGroup.Triceps, DifficultyLevel.Beginner, null, "pushdown"),
+
+            // Leg Exercises
+            CreateExercise("SQUAT", ExerciseType.Strength, MuscleGroup.Quadriceps, DifficultyLevel.Intermediate, MuscleGroup.Glutes, "squat"),
+            CreateExercise("LEG_PRESS", ExerciseType.Strength, MuscleGroup.Quadriceps, DifficultyLevel.Beginner, MuscleGroup.Glutes, "legpress"),
+            CreateExercise("LEG_CURL", ExerciseType.Strength, MuscleGroup.Hamstrings, DifficultyLevel.Beginner, null, "legcurl"),
+            CreateExercise("LEG_EXTENSION", ExerciseType.Strength, MuscleGroup.Quadriceps, DifficultyLevel.Beginner, null, "legext"),
+            CreateExercise("CALF_RAISE", ExerciseType.Strength, MuscleGroup.Calves, DifficultyLevel.Beginner, null, "calf"),
+            CreateExercise("LUNGES", ExerciseType.Strength, MuscleGroup.Quadriceps, DifficultyLevel.Beginner, MuscleGroup.Glutes, "lunge"),
+
+            // Core Exercises
+            CreateExercise("PLANK", ExerciseType.Strength, MuscleGroup.Abs, DifficultyLevel.Beginner, MuscleGroup.Core, "plank"),
+            CreateExercise("CRUNCHES", ExerciseType.Strength, MuscleGroup.Abs, DifficultyLevel.Beginner, null, "crunch"),
+            CreateExercise("RUSSIAN_TWIST", ExerciseType.Strength, MuscleGroup.Obliques, DifficultyLevel.Intermediate, null, "twist"),
+            CreateExercise("MOUNTAIN_CLIMBER", ExerciseType.Cardio, MuscleGroup.Core, DifficultyLevel.Intermediate, MuscleGroup.FullBody, "mountain"),
+
+            // Cardio Exercises
+            CreateExercise("TREADMILL_RUN", ExerciseType.Cardio, MuscleGroup.LowerBody, DifficultyLevel.Beginner, null, "treadmill"),
+            CreateExercise("CYCLING", ExerciseType.Cardio, MuscleGroup.LowerBody, DifficultyLevel.Beginner, null, "bike"),
+            CreateExercise("ELLIPTICAL", ExerciseType.Cardio, MuscleGroup.FullBody, DifficultyLevel.Beginner, null, "elliptical"),
+            CreateExercise("ROWING", ExerciseType.Cardio, MuscleGroup.FullBody, DifficultyLevel.Intermediate, null, "rowing"),
+            CreateExercise("STAIR_CLIMBER", ExerciseType.Cardio, MuscleGroup.LowerBody, DifficultyLevel.Intermediate, null, "stairs"),
+
+            // Functional Exercises
+            CreateExercise("BURPEES", ExerciseType.Functional, MuscleGroup.FullBody, DifficultyLevel.Advanced, null, "burpee"),
+            CreateExercise("KETTLEBELL_SWING", ExerciseType.Functional, MuscleGroup.FullBody, DifficultyLevel.Intermediate, null, "kettlebell"),
+            CreateExercise("BATTLE_ROPES", ExerciseType.Cardio, MuscleGroup.UpperBody, DifficultyLevel.Intermediate, null, "ropes"),
+            CreateExercise("BOX_JUMP", ExerciseType.Plyometric, MuscleGroup.LowerBody, DifficultyLevel.Intermediate, null, "boxjump")
+        };
+
+        await context.Exercises.AddRangeAsync(exercises);
+
+        // Add translations for exercises
+        foreach (var exercise in exercises)
+        {
+            AddExerciseTranslations(exercise);
+        }
+    }
+
+    private static Exercise CreateExercise(string code, ExerciseType type, MuscleGroup primary,
+                                         DifficultyLevel difficulty, MuscleGroup? secondary = null, string? icon = null)
+    {
+        return Exercise.CreateNew(code, type, primary, difficulty, secondary, icon);
+    }
+
+    private static void AddExerciseTranslations(Exercise exercise)
+    {
+        var translations = GetExerciseTranslations(exercise.Code);
+        foreach (var (language, name, description, instructions) in translations)
+        {
+            exercise.AddTranslation(language, name, description, instructions);
+        }
+    }
+
+    private static IEnumerable<(Language language, string name, string description, string instructions)> GetExerciseTranslations(string code)
+    {
+        var translationMap = new Dictionary<string, (string enName, string arName, string enDesc, string arDesc, string enInstr, string arInstr)>
+        {
+            ["BENCH_PRESS"] = ("Bench Press", "ضغط البنش", "Chest exercise using barbell", "تمرين الصدر باستخدام البار", "Lie on bench, press bar up and down", "استلق على البنش واضغط البار لأعلى وأسفل"),
+            ["INCLINE_PRESS"] = ("Incline Press", "الضغط المائل", "Upper chest exercise", "تمرين الجزء العلوي من الصدر", "Press at 45-degree angle", "اضغط بزاوية 45 درجة"),
+            ["PUSHUP"] = ("Push-up", "تمرين الضغط", "Bodyweight chest exercise", "تمرين الصدر بوزن الجسم", "Lower body to ground, push up", "اخفض الجسم للأرض ثم ادفع لأعلى"),
+            ["CHEST_FLY"] = ("Chest Fly", "فتح الصدر", "Isolation exercise for chest", "تمرين عزل للصدر", "Bring weights together in arc motion", "اجمع الأوزان معاً بحركة دائرية"),
+            ["DIPS"] = ("Dips", "الغطس", "Compound upper body exercise", "تمرين مركب للجزء العلوي", "Lower and raise body between bars", "اخفض وارفع الجسم بين القضبان"),
+
+            ["PULL_UP"] = ("Pull-up", "العقلة", "Back and bicep exercise", "تمرين الظهر والبايسبس", "Pull body up to bar", "اسحب الجسم لأعلى للبار"),
+            ["LAT_PULLDOWN"] = ("Lat Pulldown", "سحب الظهر العلوي", "Upper back exercise", "تمرين الظهر العلوي", "Pull bar down to chest", "اسحب البار لأسفل للصدر"),
+            ["BENT_ROW"] = ("Bent-over Row", "التجديف المنحني", "Middle back exercise", "تمرين وسط الظهر", "Pull weight to chest while bent over", "اسحب الوزن للصدر أثناء الانحناء"),
+            ["DEADLIFT"] = ("Deadlift", "الرفعة الميتة", "Full body compound exercise", "تمرين مركب للجسم كامل", "Lift weight from ground to standing", "ارفع الوزن من الأرض للوقوف"),
+            ["T_BAR_ROW"] = ("T-Bar Row", "تجديف التي بار", "Middle back rowing exercise", "تمرين تجديف وسط الظهر", "Pull T-bar to chest", "اسحب التي بار للصدر"),
+
+            ["SHOULDER_PRESS"] = ("Shoulder Press", "ضغط الكتف", "Shoulder strength exercise", "تمرين قوة الكتف", "Press weight overhead", "اضغط الوزن لأعلى الرأس"),
+            ["LATERAL_RAISE"] = ("Lateral Raise", "رفع جانبي", "Side deltoid exercise", "تمرين الدلتويد الجانبي", "Raise weights to sides", "ارفع الأوزان للجانبين"),
+            ["REAR_DELT_FLY"] = ("Rear Delt Fly", "فتح الكتف الخلفي", "Rear deltoid exercise", "تمرين الكتف الخلفي", "Fly weights backward", "احرك الأوزان للخلف"),
+            ["UPRIGHT_ROW"] = ("Upright Row", "التجديف العمودي", "Shoulder and trap exercise", "تمرين الكتف والترابيس", "Pull weight up along body", "اسحب الوزن لأعلى بمحاذاة الجسم"),
+
+            ["BICEP_CURL"] = ("Bicep Curl", "عضلة الباي", "Bicep isolation exercise", "تمرين عزل الباي", "Curl weight up to shoulder", "اثن الوزن لأعلى للكتف"),
+            ["HAMMER_CURL"] = ("Hammer Curl", "الكيرل المطرقي", "Bicep and forearm exercise", "تمرين الباي والساعد", "Curl with neutral grip", "اثن بقبضة محايدة"),
+            ["TRICEP_EXTENSION"] = ("Tricep Extension", "تمديد الترايسبس", "Tricep isolation exercise", "تمرين عزل الترايسبس", "Extend arm overhead", "مد الذراع لأعلى الرأس"),
+            ["TRICEP_PUSHDOWN"] = ("Tricep Pushdown", "ضغط الترايسبس", "Tricep cable exercise", "تمرين الترايسبس بالكابل", "Push cable down", "ادفع الكابل لأسفل"),
+
+            ["SQUAT"] = ("Squat", "القرفصاء", "Lower body compound exercise", "تمرين مركب للجزء السفلي", "Squat down and stand up", "اقرفص لأسفل وقف"),
+            ["LEG_PRESS"] = ("Leg Press", "ضغط الرجل", "Quadricep exercise", "تمرين عضلة الفخذ الأمامية", "Press weight with legs", "ادفع الوزن بالرجلين"),
+            ["LEG_CURL"] = ("Leg Curl", "ثني الرجل", "Hamstring exercise", "تمرين عضلة الفخذ الخلفية", "Curl heels to glutes", "اثن الكعبين للمؤخرة"),
+            ["LEG_EXTENSION"] = ("Leg Extension", "تمديد الرجل", "Quadricep isolation", "عزل عضلة الفخذ الأمامية", "Extend legs straight", "مد الرجلين مستقيمة"),
+            ["CALF_RAISE"] = ("Calf Raise", "رفع السمانة", "Calf muscle exercise", "تمرين عضلة السمانة", "Raise up on toes", "ارفع على أطراف الأصابع"),
+            ["LUNGES"] = ("Lunges", "الطعنات", "Single leg exercise", "تمرين الرجل الواحدة", "Step forward and lunge down", "اخط للأمام واطعن لأسفل"),
+
+            ["PLANK"] = ("Plank", "البلانك", "Core stability exercise", "تمرين ثبات الجذع", "Hold body straight", "حافظ على الجسم مستقيماً"),
+            ["CRUNCHES"] = ("Crunches", "البطن", "Abdominal exercise", "تمرين البطن", "Crunch up towards knees", "اثن لأعلى باتجاه الركبتين"),
+            ["RUSSIAN_TWIST"] = ("Russian Twist", "اللف الروسي", "Oblique exercise", "تمرين الجانبين", "Twist from side to side", "الف من جانب لآخر"),
+            ["MOUNTAIN_CLIMBER"] = ("Mountain Climber", "متسلق الجبال", "Cardio core exercise", "تمرين كارديو للجذع", "Alternate knees to chest", "بدل الركبتين للصدر"),
+
+            ["TREADMILL_RUN"] = ("Treadmill Run", "الجري على الجهاز", "Cardio running exercise", "تمرين جري كارديو", "Run on treadmill", "اجر على جهاز الجري"),
+            ["CYCLING"] = ("Cycling", "ركوب الدراجة", "Cardio cycling exercise", "تمرين كارديو بالدراجة", "Pedal on exercise bike", "ادعس على دراجة التمارين"),
+            ["ELLIPTICAL"] = ("Elliptical", "الإليبتيكال", "Low impact cardio", "كارديو قليل التأثير", "Move in elliptical motion", "تحرك بحركة بيضاوية"),
+            ["ROWING"] = ("Rowing", "التجديف", "Full body cardio", "كارديو للجسم كامل", "Pull rowing handle", "اسحب مقبض التجديف"),
+            ["STAIR_CLIMBER"] = ("Stair Climber", "صاعد الدرج", "Lower body cardio", "كارديو للجزء السفلي", "Step up continuously", "اصعد باستمرار"),
+
+            ["BURPEES"] = ("Burpees", "البيربي", "Full body exercise", "تمرين للجسم كامل", "Squat, jump back, push-up, jump up", "اقرفص، اقفز للخلف، ضغط، اقفز لأعلى"),
+            ["KETTLEBELL_SWING"] = ("Kettlebell Swing", "أرجحة الكيتل بيل", "Hip hinge exercise", "تمرين مفصل الورك", "Swing kettlebell up", "أرجح الكيتل بيل لأعلى"),
+            ["BATTLE_ROPES"] = ("Battle Ropes", "الحبال القتالية", "High intensity exercise", "تمرين عالي الشدة", "Wave ropes up and down", "حرك الحبال لأعلى وأسفل"),
+            ["BOX_JUMP"] = ("Box Jump", "القفز على الصندوق", "Plyometric exercise", "تمرين بليومتري", "Jump onto box", "اقفز على الصندوق")
+        };
+
+        if (translationMap.TryGetValue(code, out var translation))
+        {
+            yield return (Language.English, translation.enName, translation.enDesc, translation.enInstr);
+            yield return (Language.Arabic, translation.arName, translation.arDesc, translation.arInstr);
+        }
+    }
+
+    private static async Task SeedUsersAsync(WorkoutDbContext context)
+    {
+        if (await context.Users.AnyAsync()) return;
+
+        var users = new[]
+        {
+            CreateUser("Ahmed", "Al-Rashid", "ahmed.rashid@gmail.com", "+966501234567", new DateTime(1990, 5, 15), Gender.Male, Language.Arabic),
+            CreateUser("Fatima", "Al-Zahra", "fatima.zahra@gmail.com", "+966501234568", new DateTime(1985, 8, 22), Gender.Female, Language.Arabic),
+            CreateUser("Mohammed", "Bin-Salem", "mohammed.salem@gmail.com", "+966501234569", new DateTime(1992, 3, 10), Gender.Male, Language.English),
+            CreateUser("Aisha", "Al-Mahmoud", "aisha.mahmoud@gmail.com", "+966501234570", new DateTime(1988, 11, 5), Gender.Female, Language.Arabic),
+            CreateUser("Omar", "Al-Khaled", "omar.khaled@gmail.com", "+966501234571", new DateTime(1995, 7, 18), Gender.Male, Language.English),
+            CreateUser("Norah", "Al-Saud", "norah.saud@gmail.com", "+966501234572", new DateTime(1991, 12, 8), Gender.Female, Language.Arabic),
+            CreateUser("Khalid", "Al-Mutairi", "khalid.mutairi@gmail.com", "+966501234573", new DateTime(1987, 4, 25), Gender.Male, Language.Arabic),
+            CreateUser("Sarah", "Al-Qahtani", "sarah.qahtani@gmail.com", "+966501234574", new DateTime(1993, 9, 14), Gender.Female, Language.English)
         };
 
         await context.Users.AddRangeAsync(users);
     }
 
-    private static async Task SeedExercises(WorkoutDbContext context) {
-        var exercises = new List<Exercise>();
-        var exerciseTranslations = new List<ExerciseTranslation>();
-
-        // Push Exercises (Chest, Shoulders, Triceps)
-        var pushExerciseData = new[]
-        {
-            new { Code = "BENCH_PRESS", PrimaryMuscle = MuscleGroup.Chest, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Triceps, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-bed", NameEn = "Bench Press", NameAr = "ضغط البنش", DescEn = "Lie on your back, lift the bar or dumbbells up until you fully extend your arms, then slowly lower them towards your chest.", DescAr = "استلق على ظهرك، ارفع البار أو الدمبلز لأعلى حتى تمد الذراعين بالكامل، ثم اخفضهما ببطء نحو الصدر." },
-            new { Code = "INCLINE_BENCH_PRESS", PrimaryMuscle = MuscleGroup.Chest, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Shoulders, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-chart-line", NameEn = "Incline Bench Press", NameAr = "ضغط البنش المائل", DescEn = "Same as bench press but on an inclined bench at 45 degrees, focuses on the upper chest.", DescAr = "نفس تمرين ضغط البنش لكن على مقعد مائل بزاوية 45 درجة، يركز على الجزء العلوي من الصدر." },
-            new { Code = "CABLE_CHEST_FLY", PrimaryMuscle = MuscleGroup.Chest, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-plane", NameEn = "Cable Chest Fly", NameAr = "تمرين الصدر بالكابل", DescEn = "Stand between cable machine, hold handles, and push arms forward while maintaining slight bend in elbows.", DescAr = "قف بين آلة الكابل، أمسك المقابض، وادفع ذراعيك للأمام مع الحفاظ على انحناء بسيط في المرفقين." },
-            new { Code = "PUSH_UPS", PrimaryMuscle = MuscleGroup.Chest, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Triceps, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-hand-paper", NameEn = "Push-ups", NameAr = "تمرين الضغط", DescEn = "Start in plank position, lower your body until chest nearly touches floor, then push back up.", DescAr = "ابدأ في وضع اللوح، اخفض جسمك حتى يلامس الصدر الأرض تقريباً، ثم ادفع للأعلى." },
-            new { Code = "SHOULDER_PRESS", PrimaryMuscle = MuscleGroup.Shoulders, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Triceps, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-arrow-up", NameEn = "Shoulder Press", NameAr = "ضغط الكتف", DescEn = "Press dumbbells or barbell overhead from shoulder level to full arm extension.", DescAr = "اضغط الدمبلز أو البار فوق الرأس من مستوى الكتف إلى امتداد الذراع الكامل." },
-            new { Code = "LATERAL_RAISES", PrimaryMuscle = MuscleGroup.Shoulders, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-expand-arrows-alt", NameEn = "Lateral Raises", NameAr = "رفع جانبي", DescEn = "Lift dumbbells out to sides until arms are parallel to floor, then lower slowly.", DescAr = "ارفع الدمبلز إلى الجانبين حتى تصبح الذراعان موازيتان للأرض، ثم اخفضهما ببطء." },
-            new { Code = "TRICEP_DIPS", PrimaryMuscle = MuscleGroup.Triceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Chest, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-angle-down", NameEn = "Tricep Dips", NameAr = "غطسات الترايسبس", DescEn = "Support body weight on parallel bars or bench, lower body by bending elbows, then push back up.", DescAr = "ادعم وزن الجسم على القضبان المتوازية أو المقعد، اخفض الجسم بثني المرفقين، ثم ادفع للأعلى." },
-            new { Code = "TRICEP_PUSHDOWN", PrimaryMuscle = MuscleGroup.Triceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrow-down", NameEn = "Tricep Pushdown", NameAr = "دفع الترايسبس لأسفل", DescEn = "Using cable machine, push the bar down while keeping elbows stationary at your sides.", DescAr = "باستخدام آلة الكابل، ادفع البار لأسفل مع إبقاء المرفقين ثابتين على جانبيك." },
-            new { Code = "DIAMOND_PUSHUPS", PrimaryMuscle = MuscleGroup.Triceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Chest, Difficulty = DifficultyLevel.Advanced, Icon = "fas fa-gem", NameEn = "Diamond Push-ups", NameAr = "تمرين الضغط الماسي", DescEn = "Push-ups with hands forming diamond shape, targets triceps more than regular push-ups.", DescAr = "تمرين الضغط مع تشكيل اليدين شكل الماس، يستهدف الترايسبس أكثر من الضغط العادي." },
-            new { Code = "CHEST_PRESS", PrimaryMuscle = MuscleGroup.Chest, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Shoulders, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-compress", NameEn = "Chest Press Machine", NameAr = "آلة ضغط الصدر", DescEn = "Seated chest press using machine, push handles forward until arms are extended.", DescAr = "ضغط الصدر جالساً باستخدام الآلة، ادفع المقابض للأمام حتى تمتد الذراعان." },
-            new { Code = "FRONT_RAISES", PrimaryMuscle = MuscleGroup.Shoulders, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrow-up", NameEn = "Front Raises", NameAr = "رفع أمامي", DescEn = "Lift dumbbells in front of body to shoulder height, then lower slowly.", DescAr = "ارفع الدمبلز أمام الجسم إلى مستوى الكتف، ثم اخفضهما ببطء." },
-            new { Code = "OVERHEAD_PRESS", PrimaryMuscle = MuscleGroup.Shoulders, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Triceps, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-arrow-up", NameEn = "Overhead Press", NameAr = "الضغط فوق الرأس", DescEn = "Press weight overhead from shoulder position to full extension above head.", DescAr = "اضغط الوزن فوق الرأس من وضع الكتف إلى الامتداد الكامل فوق الرأس." }
-        };
-
-        // Pull Exercises (Back, Biceps)
-        var pullExerciseData = new[]
-        {
-            new { Code = "PULL_UPS", PrimaryMuscle = MuscleGroup.Back, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Biceps, Difficulty = DifficultyLevel.Advanced, Icon = "fas fa-arrow-up", NameEn = "Pull-ups", NameAr = "العقلة", DescEn = "Hang from bar and pull body up until chin clears the bar, then lower slowly.", DescAr = "تعلق من البار واسحب الجسم لأعلى حتى يتجاوز الذقن البار، ثم اخفض ببطء." },
-            new { Code = "LAT_PULLDOWN", PrimaryMuscle = MuscleGroup.Back, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Biceps, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrow-down", NameEn = "Lat Pulldown", NameAr = "سحب عالي", DescEn = "Pull the bar down to chest level while seated, focusing on back muscles.", DescAr = "اسحب البار لأسفل إلى مستوى الصدر أثناء الجلوس، مع التركيز على عضلات الظهر." },
-            new { Code = "BENT_OVER_ROW", PrimaryMuscle = MuscleGroup.Back, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Biceps, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-arrows-alt-h", NameEn = "Bent Over Row", NameAr = "التجديف المنحني", DescEn = "Bend forward at hips, pull barbell or dumbbells to lower chest, squeeze shoulder blades.", DescAr = "انحن للأمام عند الوركين، اسحب البار أو الدمبلز إلى أسفل الصدر، اضغط لوحي الكتف." },
-            new { Code = "SEATED_ROW", PrimaryMuscle = MuscleGroup.Back, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Biceps, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrows-alt-h", NameEn = "Seated Cable Row", NameAr = "التجديف جالساً", DescEn = "Sit and pull cable handles to torso, keeping back straight and squeezing shoulder blades.", DescAr = "اجلس واسحب مقابض الكابل إلى الجذع، مع إبقاء الظهر مستقيماً وضغط لوحي الكتف." },
-            new { Code = "BICEP_CURLS", PrimaryMuscle = MuscleGroup.Biceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-dumbbell", NameEn = "Bicep Curls", NameAr = "تمرين البايسبس", DescEn = "Curl dumbbells up to shoulder level, keeping elbows stationary at sides.", DescAr = "اثن الدمبلز لأعلى إلى مستوى الكتف، مع إبقاء المرفقين ثابتين على الجانبين." },
-            new { Code = "HAMMER_CURLS", PrimaryMuscle = MuscleGroup.Biceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-hammer", NameEn = "Hammer Curls", NameAr = "تمرين المطرقة", DescEn = "Curl dumbbells with neutral grip (palms facing each other), targets different part of biceps.", DescAr = "اثن الدمبلز بقبضة محايدة (الكفان متقابلان)، يستهدف جزءاً مختلفاً من البايسبس." },
-            new { Code = "FACE_PULLS", PrimaryMuscle = MuscleGroup.Shoulders, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Back, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrows-alt-h", NameEn = "Face Pulls", NameAr = "سحب الوجه", DescEn = "Pull cable rope to face level, separating hands at the end, targets rear delts.", DescAr = "اسحب حبل الكابل إلى مستوى الوجه، مع فصل اليدين في النهاية، يستهدف الدلتا الخلفية." },
-            new { Code = "REVERSE_FLY", PrimaryMuscle = MuscleGroup.Shoulders, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Back, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-expand", NameEn = "Reverse Fly", NameAr = "الطيران العكسي", DescEn = "Lift dumbbells out to sides while bent forward, targets rear deltoids.", DescAr = "ارفع الدمبلز إلى الجانبين أثناء الانحناء للأمام، يستهدف الدلتا الخلفية." },
-            new { Code = "CHIN_UPS", PrimaryMuscle = MuscleGroup.Biceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Back, Difficulty = DifficultyLevel.Advanced, Icon = "fas fa-arrow-up", NameEn = "Chin-ups", NameAr = "العقلة بقبضة عكسية", DescEn = "Pull-ups with underhand grip, emphasizes biceps more than regular pull-ups.", DescAr = "العقلة بقبضة عكسية، تؤكد على البايسبس أكثر من العقلة العادية." },
-            new { Code = "PREACHER_CURLS", PrimaryMuscle = MuscleGroup.Biceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-dumbbell", NameEn = "Preacher Curls", NameAr = "تمرين الواعظ", DescEn = "Bicep curls performed on preacher bench for better isolation.", DescAr = "تمرين البايسبس يُؤدى على مقعد الواعظ لعزل أفضل." },
-            new { Code = "T_BAR_ROW", PrimaryMuscle = MuscleGroup.Back, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Biceps, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-arrows-alt-h", NameEn = "T-Bar Row", NameAr = "تجديف البار T", DescEn = "Row using T-bar apparatus, excellent for building back thickness.", DescAr = "التجديف باستخدام جهاز البار T، ممتاز لبناء سماكة الظهر." },
-            new { Code = "CABLE_CURLS", PrimaryMuscle = MuscleGroup.Biceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-dumbbell", NameEn = "Cable Curls", NameAr = "تمرين البايسبس بالكابل", DescEn = "Bicep curls using cable machine for constant tension throughout the movement.", DescAr = "تمرين البايسبس باستخدام آلة الكابل للحصول على توتر ثابت طوال الحركة." }
-        };
-
-        // Leg Exercises (Quadriceps, Hamstrings, Glutes, Calves)
-        var legExerciseData = new[]
-        {
-            new { Code = "SQUATS", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Glutes, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-arrow-down", NameEn = "Squats", NameAr = "القرفصاء", DescEn = "Lower body by bending knees and hips, keep chest up and knees behind toes.", DescAr = "اخفض الجسم بثني الركبتين والوركين، حافظ على الصدر مرفوعاً والركبتين خلف أصابع القدم." },
-            new { Code = "DEADLIFTS", PrimaryMuscle = MuscleGroup.Hamstrings, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Back, Difficulty = DifficultyLevel.Advanced, Icon = "fas fa-weight-hanging", NameEn = "Deadlifts", NameAr = "الرفعة المميتة", DescEn = "Lift barbell from floor to hip level, keeping back straight and core engaged.", DescAr = "ارفع البار من الأرض إلى مستوى الورك، مع إبقاء الظهر مستقيماً والجذع مشدوداً." },
-            new { Code = "LUNGES", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Glutes, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-walking", NameEn = "Lunges", NameAr = "الاندفاع", DescEn = "Step forward into lunge position, lower back knee toward ground, then return to start.", DescAr = "اخطو للأمام في وضع الاندفاع، اخفض الركبة الخلفية نحو الأرض، ثم عد للبداية." },
-            new { Code = "LEG_PRESS", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Glutes, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-compress", NameEn = "Leg Press", NameAr = "ضغط الأرجل", DescEn = "Press weight with legs while seated in leg press machine.", DescAr = "اضغط الوزن بالأرجل أثناء الجلوس في آلة ضغط الأرجل." },
-            new { Code = "LEG_CURLS", PrimaryMuscle = MuscleGroup.Hamstrings, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-undo", NameEn = "Leg Curls", NameAr = "ثني الأرجل", DescEn = "Curl legs up while lying face down on leg curl machine.", DescAr = "اثن الأرجل لأعلى أثناء الاستلقاء على البطن في آلة ثني الأرجل." },
-            new { Code = "LEG_EXTENSIONS", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-expand", NameEn = "Leg Extensions", NameAr = "مد الأرجل", DescEn = "Extend legs while seated in leg extension machine.", DescAr = "مد الأرجل أثناء الجلوس في آلة مد الأرجل." },
-            new { Code = "CALF_RAISES", PrimaryMuscle = MuscleGroup.Calves, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrow-up", NameEn = "Calf Raises", NameAr = "رفع السمانة", DescEn = "Rise up on toes as high as possible, then lower slowly.", DescAr = "ارتفع على أصابع القدم أعلى ما يمكن، ثم اخفض ببطء." },
-            new { Code = "BULGARIAN_SPLIT_SQUATS", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Glutes, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-walking", NameEn = "Bulgarian Split Squats", NameAr = "القرفصاء البلغارية", DescEn = "Single leg squat with rear foot elevated on bench or platform.", DescAr = "قرفصاء برجل واحدة مع رفع القدم الخلفية على مقعد أو منصة." },
-            new { Code = "HIP_THRUSTS", PrimaryMuscle = MuscleGroup.Glutes, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Hamstrings, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-arrow-up", NameEn = "Hip Thrusts", NameAr = "دفع الورك", DescEn = "Thrust hips up while back is on bench, squeeze glutes at the top.", DescAr = "ادفع الوركين لأعلى أثناء وضع الظهر على المقعد، اضغط المؤخرة في الأعلى." },
-            new { Code = "GOBLET_SQUATS", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Glutes, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-wine-glass", NameEn = "Goblet Squats", NameAr = "قرفصاء الكأس", DescEn = "Squats while holding dumbbell or kettlebell at chest level.", DescAr = "القرفصاء أثناء حمل الدمبل أو الكيتل بل على مستوى الصدر." },
-            new { Code = "ROMANIAN_DEADLIFTS", PrimaryMuscle = MuscleGroup.Hamstrings, SecondaryMuscle = (MuscleGroup?)MuscleGroup.Glutes, Difficulty = DifficultyLevel.Intermediate, Icon = "fas fa-weight-hanging", NameEn = "Romanian Deadlifts", NameAr = "الرفعة الرومانية", DescEn = "Deadlift variation focusing on hamstrings, lower weight by pushing hips back.", DescAr = "تنويع الرفعة المميتة يركز على الهامسترينغ، اخفض الوزن بدفع الوركين للخلف." },
-            new { Code = "WALL_SIT", PrimaryMuscle = MuscleGroup.Quadriceps, SecondaryMuscle = (MuscleGroup?)null, Difficulty = DifficultyLevel.Beginner, Icon = "fas fa-chair", NameEn = "Wall Sit", NameAr = "الجلوس على الحائط", DescEn = "Sit against wall with thighs parallel to floor, hold position.", DescAr = "اجلس على الحائط مع جعل الفخذين موازيين للأرض، احتفظ بالوضعية." }
-        };
-
-        // Create Exercise entities for Push exercises
-        foreach (var pushEx in pushExerciseData)
-        {
-            var exercise = new Exercise {
-                Code = pushEx.Code,
-                Type = ExerciseType.Push,
-                PrimaryMuscleGroup = pushEx.PrimaryMuscle,
-                SecondaryMuscleGroup = pushEx.SecondaryMuscle,
-                Difficulty = pushEx.Difficulty,
-                IconName = pushEx.Icon,
-                IsActive = true
-            };
-            exercises.Add(exercise);
-
-            // Add translations
-            exerciseTranslations.Add(new ExerciseTranslation {
-                ExerciseId = exercise.Id,
-                Language = Language.English,
-                Name = pushEx.NameEn,
-                Description = pushEx.DescEn
-            });
-
-            exerciseTranslations.Add(new ExerciseTranslation {
-                ExerciseId = exercise.Id,
-                Language = Language.Arabic,
-                Name = pushEx.NameAr,
-                Description = pushEx.DescAr
-            });
-        }
-
-        // Create Exercise entities for Pull exercises
-        foreach (var pullEx in pullExerciseData)
-        {
-            var exercise = new Exercise {
-                Code = pullEx.Code,
-                Type = ExerciseType.Pull,
-                PrimaryMuscleGroup = pullEx.PrimaryMuscle,
-                SecondaryMuscleGroup = pullEx.SecondaryMuscle,
-                Difficulty = pullEx.Difficulty,
-                IconName = pullEx.Icon,
-                IsActive = true
-            };
-            exercises.Add(exercise);
-
-            // Add translations
-            exerciseTranslations.Add(new ExerciseTranslation {
-                ExerciseId = exercise.Id,
-                Language = Language.English,
-                Name = pullEx.NameEn,
-                Description = pullEx.DescEn
-            });
-
-            exerciseTranslations.Add(new ExerciseTranslation {
-                ExerciseId = exercise.Id,
-                Language = Language.Arabic,
-                Name = pullEx.NameAr,
-                Description = pullEx.DescAr
-            });
-        }
-
-        // Create Exercise entities for Leg exercises
-        foreach (var legEx in legExerciseData)
-        {
-            var exercise = new Exercise {
-                Code = legEx.Code,
-                Type = ExerciseType.Legs,
-                PrimaryMuscleGroup = legEx.PrimaryMuscle,
-                SecondaryMuscleGroup = legEx.SecondaryMuscle,
-                Difficulty = legEx.Difficulty,
-                IconName = legEx.Icon,
-                IsActive = true
-            };
-            exercises.Add(exercise);
-
-            // Add translations
-            exerciseTranslations.Add(new ExerciseTranslation {
-                ExerciseId = exercise.Id,
-                Language = Language.English,
-                Name = legEx.NameEn,
-                Description = legEx.DescEn
-            });
-
-            exerciseTranslations.Add(new ExerciseTranslation {
-                ExerciseId = exercise.Id,
-                Language = Language.Arabic,
-                Name = legEx.NameAr,
-                Description = legEx.DescAr
-            });
-        }
-
-        await context.Exercises.AddRangeAsync(exercises);
-        await context.ExerciseTranslations.AddRangeAsync(exerciseTranslations);
+    private static User CreateUser(string firstName, string lastName, string email, string phone,
+                                 DateTime dateOfBirth, Gender gender, Language language)
+    {
+        var personalInfo = new PersonalInfo(firstName, lastName, dateOfBirth, gender);
+        var contactInfo = new ContactInfo(email, phone);
+        return User.CreateNew(personalInfo, contactInfo, language);
     }
 
-    private static async Task SeedWorkoutPlans(WorkoutDbContext context) {
-        var workoutPlans = new List<WorkoutPlan>();
-        var workoutPlanTranslations = new List<WorkoutPlanTranslation>();
-        var workoutPlanExercises = new List<WorkoutPlanExercise>();
+    private static async Task SeedTrainersAsync(WorkoutDbContext context)
+    {
+        if (await context.Trainers.AnyAsync()) return;
 
-        // Get exercises
-        var pushExercises = await context.Exercises.Where(e => e.Type == ExerciseType.Push).Take(12).ToListAsync();
-        var pullExercises = await context.Exercises.Where(e => e.Type == ExerciseType.Pull).Take(12).ToListAsync();
-        var legExercises = await context.Exercises.Where(e => e.Type == ExerciseType.Legs).Take(12).ToListAsync();
+        // Get some users to make them trainers
+        var users = await context.Users.Take(4).ToListAsync();
 
-        // Push Day Plan
-        var pushPlan = new WorkoutPlan {
-            Code = "PUSH_DAY_PLAN",
-            Type = ExerciseType.Push,
-            IsActive = true
-        };
-        workoutPlans.Add(pushPlan);
-
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
-            WorkoutPlanId = pushPlan.Id,
-            Language = Language.English,
-            Name = "Push Day Workout",
-            Description = "Complete push workout targeting chest, shoulders, and triceps with 12 exercises"
-        });
-
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
-            WorkoutPlanId = pushPlan.Id,
-            Language = Language.Arabic,
-            Name = "يوم الدفع",
-            Description = "تمرين دفع كامل يستهدف الصدر والكتف والترايسبس بـ 12 تمريناً"
-        });
-
-        // Add exercises to push plan
-        for (int i = 0; i < pushExercises.Count; i++)
+        var trainers = new[]
         {
-            workoutPlanExercises.Add(new WorkoutPlanExercise {
-                WorkoutPlanId = pushPlan.Id,
-                ExerciseId = pushExercises[i].Id,
-                Order = i + 1,
-                Sets = i < 4 ? 4 : 3, // First 4 exercises have 4 sets, rest have 3
-                Reps = i < 8 ? 12 : 15, // First 8 exercises have 12 reps, rest have 15
-                DefaultRestTime = TimeSpan.FromSeconds(60)
-            });
-        }
-
-        // Pull Day Plan
-        var pullPlan = new WorkoutPlan {
-            Code = "PULL_DAY_PLAN",
-            Type = ExerciseType.Pull,
-            IsActive = true
+            CreateTrainer(users[0].Guid, "Strength Training & Bodybuilding", "ACSM Certified Personal Trainer", 150),
+            CreateTrainer(users[1].Guid, "Yoga & Pilates", "RYT-500 Yoga Alliance", 120),
+            CreateTrainer(users[2].Guid, "CrossFit & Functional Training", "CrossFit Level 2 Trainer", 180),
+            CreateTrainer(users[3].Guid, "Cardio & Weight Loss", "NASM Certified Personal Trainer", 130)
         };
-        workoutPlans.Add(pullPlan);
 
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
-            WorkoutPlanId = pullPlan.Id,
-            Language = Language.English,
-            Name = "Pull Day Workout",
-            Description = "Complete pull workout targeting back, biceps, and rear delts with 12 exercises"
-        });
-
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
-            WorkoutPlanId = pullPlan.Id,
-            Language = Language.Arabic,
-            Name = "يوم السحب",
-            Description = "تمرين سحب كامل يستهدف الظهر والبايسبس والدلتا الخلفية بـ 12 تمريناً"
-        });
-
-        // Add exercises to pull plan
-        for (int i = 0; i < pullExercises.Count; i++)
-        {
-            workoutPlanExercises.Add(new WorkoutPlanExercise {
-                WorkoutPlanId = pullPlan.Id,
-                ExerciseId = pullExercises[i].Id,
-                Order = i + 1,
-                Sets = i < 4 ? 4 : 3,
-                Reps = i < 8 ? 12 : 15,
-                DefaultRestTime = TimeSpan.FromSeconds(60)
-            });
-        }
-
-        // Legs Day Plan
-        var legsPlan = new WorkoutPlan {
-            Code = "LEGS_DAY_PLAN",
-            Type = ExerciseType.Legs,
-            IsActive = true
-        };
-        workoutPlans.Add(legsPlan);
-
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
-            WorkoutPlanId = legsPlan.Id,
-            Language = Language.English,
-            Name = "Legs Day Workout",
-            Description = "Complete legs workout targeting quadriceps, hamstrings, glutes, and calves with 12 exercises"
-        });
-
-        workoutPlanTranslations.Add(new WorkoutPlanTranslation {
-            WorkoutPlanId = legsPlan.Id,
-            Language = Language.Arabic,
-            Name = "يوم الأرجل",
-            Description = "تمرين أرجل كامل يستهدف الكوادريسبس والهامسترينغ والمؤخرة والسمانة بـ 12 تمريناً"
-        });
-
-        // Add exercises to legs plan
-        for (int i = 0; i < legExercises.Count; i++)
-        {
-            workoutPlanExercises.Add(new WorkoutPlanExercise {
-                WorkoutPlanId = legsPlan.Id,
-                ExerciseId = legExercises[i].Id,
-                Order = i + 1,
-                Sets = i < 4 ? 4 : 3,
-                Reps = i < 8 ? 12 : 15,
-                DefaultRestTime = TimeSpan.FromSeconds(90) // Legs need more rest
-            });
-        }
-
-        await context.WorkoutPlans.AddRangeAsync(workoutPlans);
-        await context.WorkoutPlanTranslations.AddRangeAsync(workoutPlanTranslations);
-        await context.WorkoutPlanExercises.AddRangeAsync(workoutPlanExercises);
+        await context.Trainers.AddRangeAsync(trainers);
     }
 
-    private static async Task SeedUserWorkoutPlans(WorkoutDbContext context) {
-        var users = await context.Users.ToListAsync();
-        var workoutPlans = await context.WorkoutPlans.ToListAsync();
-        var userWorkoutPlans = new List<UserWorkoutPlan>();
+    private static Trainer CreateTrainer(Guid userId, string specialization, string certification, decimal hourlyRate)
+    {
+        return Trainer.CreateNew(userId, specialization, certification, new Money(hourlyRate, "SAR"));
+    }
 
-        // Assign workout plans to users
-        foreach (var user in users)
+    private static async Task SeedGymClassesAsync(WorkoutDbContext context)
+    {
+        if (await context.GymClasses.AnyAsync()) return;
+
+        var trainers = await context.Trainers.ToListAsync();
+
+        var gymClasses = new[]
         {
-            foreach (var plan in workoutPlans)
-            {
-                userWorkoutPlans.Add(new UserWorkoutPlan {
-                    UserId = user.Id,
-                    WorkoutPlanId = plan.Id,
-                    AssignedDate = DateTime.UtcNow.AddDays(-Random.Shared.Next(1, 15)),
-                    IsActive = true
-                });
-            }
-        }
+            CreateGymClass("Morning Yoga", "Gentle yoga to start your day", 20, TimeSpan.FromMinutes(60), DifficultyLevel.Beginner, trainers.FirstOrDefault()?.UserId),
+            CreateGymClass("HIIT Cardio", "High-intensity interval training", 15, TimeSpan.FromMinutes(45), DifficultyLevel.Intermediate, trainers.Skip(1).FirstOrDefault()?.UserId),
+            CreateGymClass("Strength & Conditioning", "Build strength and muscle", 12, TimeSpan.FromMinutes(75), DifficultyLevel.Advanced, trainers.Skip(2).FirstOrDefault()?.UserId),
+            CreateGymClass("Pilates Core", "Core strengthening through Pilates", 18, TimeSpan.FromMinutes(50), DifficultyLevel.Beginner, trainers.Skip(1).FirstOrDefault()?.UserId),
+            CreateGymClass("CrossFit WOD", "Workout of the Day - CrossFit style", 10, TimeSpan.FromMinutes(60), DifficultyLevel.Advanced, trainers.Skip(2).FirstOrDefault()?.UserId),
+            CreateGymClass("Zumba Dance", "Fun dance fitness class", 25, TimeSpan.FromMinutes(55), DifficultyLevel.Beginner, null),
+            CreateGymClass("Boxing Fitness", "Non-contact boxing workout", 16, TimeSpan.FromMinutes(60), DifficultyLevel.Intermediate, null),
+            CreateGymClass("Spinning", "Indoor cycling workout", 20, TimeSpan.FromMinutes(45), DifficultyLevel.Intermediate, null)
+        };
 
-        await context.UserWorkoutPlans.AddRangeAsync(userWorkoutPlans);
+        await context.GymClasses.AddRangeAsync(gymClasses);
+    }
+
+    private static GymClass CreateGymClass(string name, string description, int maxCapacity,
+                                         TimeSpan duration, DifficultyLevel difficulty, Guid? instructorId = null)
+    {
+        return GymClass.CreateNew(name, description, maxCapacity, duration, difficulty, instructorId);
     }
 }
 
+// ===== SEEDER EXTENSION METHOD =====
+
+public static class DatabaseSeederExtensions
+{
+    public static async Task<IServiceProvider> SeedDatabaseAsync(this IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<WorkoutDbContext>();
+
+        try
+        {
+            // Ensure database is created
+            await context.Database.EnsureCreatedAsync();
+
+            // Run migrations if any
+            if (context.Database.GetPendingMigrations().Any())
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            // Seed data
+            await DatabaseSeeder.SeedAsync(context);
+        }
+        catch (Exception ex)
+        {
+             throw;
+        }
+
+        return serviceProvider;
+    }
+}

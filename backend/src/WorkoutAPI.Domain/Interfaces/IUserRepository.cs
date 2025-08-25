@@ -1,9 +1,10 @@
 using WorkoutAPI.Domain.Aggregates;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Interfaces;
 
-public interface IUserRepository : IRepository<User> {
+public interface IUserRepository : IRepository<User>
+{
     Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
     Task<User?> GetByMembershipNumberAsync(string membershipNumber, CancellationToken cancellationToken = default);
     Task<IEnumerable<User>> GetActiveUsersAsync(CancellationToken cancellationToken = default);

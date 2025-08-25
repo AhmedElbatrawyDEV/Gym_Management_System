@@ -2,13 +2,14 @@
 // Entities
 using WorkoutAPI.Domain.Common;
 using WorkoutAPI.Domain.Entities;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 using WorkoutAPI.Domain.Events;
 
 namespace WorkoutAPI.Domain.Aggregates;
 
 // WORKOUT SESSION AGGREGATE ROOT
-public class WorkoutSession : AggregateRoot<WorkoutSession> {
+public class WorkoutSession : AggregateRoot<WorkoutSession>
+{
     private readonly List<WorkoutSessionExercise> _exercises = new();
 
     public Guid UserId { get; private set; }
@@ -21,7 +22,8 @@ public class WorkoutSession : AggregateRoot<WorkoutSession> {
 
     public IReadOnlyCollection<WorkoutSessionExercise> Exercises => _exercises.AsReadOnly();
 
-    public static WorkoutSession CreateNew(Guid userId, string title, DateTime startTime, Guid? trainerId = null) {
+    public static WorkoutSession CreateNew(Guid userId, string title, DateTime startTime, Guid? trainerId = null)
+    {
         var session = BaseFactory.Create();
         session.UserId = userId;
         session.TrainerId = trainerId;
@@ -31,7 +33,8 @@ public class WorkoutSession : AggregateRoot<WorkoutSession> {
         return session;
     }
 
-    public void StartSession() {
+    public void StartSession()
+    {
         if (Status != WorkoutSessionStatus.Scheduled)
             throw new InvalidOperationException("Can only start scheduled sessions");
 
@@ -39,7 +42,8 @@ public class WorkoutSession : AggregateRoot<WorkoutSession> {
         StartTime = DateTime.UtcNow;
     }
 
-    public void CompleteSession(string? notes = null) {
+    public void CompleteSession(string? notes = null)
+    {
         if (Status != WorkoutSessionStatus.InProgress)
             throw new InvalidOperationException("Can only complete sessions in progress");
 
@@ -51,7 +55,8 @@ public class WorkoutSession : AggregateRoot<WorkoutSession> {
         AddEvent(new WorkoutSessionCompletedEvent(Guid, UserId, duration));
     }
 
-    public void CancelSession(string reason) {
+    public void CancelSession(string reason)
+    {
         if (Status == WorkoutSessionStatus.Completed)
             throw new InvalidOperationException("Cannot cancel completed session");
 
@@ -59,11 +64,12 @@ public class WorkoutSession : AggregateRoot<WorkoutSession> {
         Notes = $"Cancelled: {reason}";
     }
 
-    public void AddExercise(Exercise exercise, int order) {
+    public void AddExercise(Exercise exercise, int order)
+    {
         if (Status != WorkoutSessionStatus.Scheduled)
             throw new InvalidOperationException("Can only add exercises to scheduled sessions");
 
-        var sessionExercise = WorkoutSessionExercise.CreateNew(Guid, exercise.Guid, order);
+        var sessionExercise = WorkoutSessionExercise.CreateNew(Guid, exercise.Id, order);
         _exercises.Add(sessionExercise);
     }
 

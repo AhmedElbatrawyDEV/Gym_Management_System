@@ -6,7 +6,8 @@ using WorkoutAPI.Domain.ValueObjects;
 namespace WorkoutAPI.Domain.Entities;
 
 // Additional supporting entities would follow the same pattern...
-public class Trainer : Entity<Trainer, Guid> {
+public class Trainer : Entity<Trainer, Guid>
+{
     public Guid UserId { get; private set; }
     public string Specialization { get; private set; } = string.Empty;
     public string Certification { get; private set; } = string.Empty;
@@ -15,8 +16,10 @@ public class Trainer : Entity<Trainer, Guid> {
 
     private Trainer() { } // EF Core
 
-    public static Trainer CreateNew(Guid userId, string specialization, string certification, Money hourlyRate) {
-        return new Trainer {
+    public static Trainer CreateNew(Guid userId, string specialization, string certification, Money hourlyRate)
+    {
+        return new Trainer
+        {
             Id = Guid.NewGuid(),
             UserId = userId,
             Specialization = specialization ?? throw new ArgumentNullException(nameof(specialization)),
@@ -25,7 +28,8 @@ public class Trainer : Entity<Trainer, Guid> {
         };
     }
 
-    public void UpdateHourlyRate(Money newRate) {
+    public void UpdateHourlyRate(Money newRate)
+    {
         HourlyRate = newRate ?? throw new ArgumentNullException(nameof(newRate));
     }
 

@@ -2,11 +2,12 @@
 // Entities
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class UserWorkoutPlan : Entity<UserWorkoutPlan, Guid> {
+public class UserWorkoutPlan : Entity<UserWorkoutPlan, Guid>
+{
     public Guid UserId { get; private set; }
     public Guid WorkoutPlanId { get; private set; }
     public DateTime StartDate { get; private set; }
@@ -23,8 +24,10 @@ public class UserWorkoutPlan : Entity<UserWorkoutPlan, Guid> {
 
     private UserWorkoutPlan() { } // EF Core
 
-    public static UserWorkoutPlan CreateNew(Guid userId, Guid workoutPlanId, DateTime startDate, Guid assignedBy) {
-        return new UserWorkoutPlan {
+    public static UserWorkoutPlan CreateNew(Guid userId, Guid workoutPlanId, DateTime startDate, Guid assignedBy)
+    {
+        return new UserWorkoutPlan
+        {
             Id = Guid.NewGuid(),
             UserId = userId,
             WorkoutPlanId = workoutPlanId,
@@ -35,7 +38,8 @@ public class UserWorkoutPlan : Entity<UserWorkoutPlan, Guid> {
         };
     }
 
-    public void Complete() {
+    public void Complete()
+    {
         if (Status != WorkoutPlanStatus.Active)
             throw new InvalidOperationException("Can only complete active workout plans");
 
@@ -44,21 +48,24 @@ public class UserWorkoutPlan : Entity<UserWorkoutPlan, Guid> {
         Progress = 100;
     }
 
-    public void Pause() {
+    public void Pause()
+    {
         if (Status != WorkoutPlanStatus.Active)
             throw new InvalidOperationException("Can only pause active workout plans");
 
         Status = WorkoutPlanStatus.Draft; // Using Draft as paused status
     }
 
-    public void Resume() {
+    public void Resume()
+    {
         if (Status != WorkoutPlanStatus.Draft)
             throw new InvalidOperationException("Can only resume paused workout plans");
 
         Status = WorkoutPlanStatus.Active;
     }
 
-    public void UpdateProgress(decimal progressPercentage) {
+    public void UpdateProgress(decimal progressPercentage)
+    {
         if (progressPercentage < 0 || progressPercentage > 100)
             throw new ArgumentException("Progress must be between 0 and 100");
 

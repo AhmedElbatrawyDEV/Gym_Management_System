@@ -2,11 +2,12 @@
 // Entities
 using WorkoutAPI.Domain.Aggregates;
 using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Domain.Enums.WorkoutAPI.Domain.Enums;
+using WorkoutAPI.Domain.Enums;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class WorkoutPlan : Entity<WorkoutPlan, Guid> {
+public class WorkoutPlan : Entity<WorkoutPlan, Guid>
+{
     private readonly List<WorkoutPlanExercise> _exercises = new();
 
     public string Name { get; private set; } = string.Empty;
@@ -27,8 +28,10 @@ public class WorkoutPlan : Entity<WorkoutPlan, Guid> {
     private WorkoutPlan() { } // EF Core
 
     public static WorkoutPlan CreateNew(string name, WorkoutPlanType type, DifficultyLevel difficultyLevel,
-                                      int durationWeeks, Guid createdBy, string? description = null) {
-        return new WorkoutPlan {
+                                      int durationWeeks, Guid createdBy, string? description = null)
+    {
+        return new WorkoutPlan
+        {
             Id = Guid.NewGuid(),
             Name = name ?? throw new ArgumentNullException(nameof(name)),
             Description = description,
@@ -42,7 +45,8 @@ public class WorkoutPlan : Entity<WorkoutPlan, Guid> {
 
     public void AddExercise(Exercise exercise, int day, int order, int sets,
                            int? reps = null, decimal? weight = null, TimeSpan? duration = null,
-                           TimeSpan? restTime = null, string? notes = null) {
+                           TimeSpan? restTime = null, string? notes = null)
+    {
         if (!IsActive)
             throw new InvalidOperationException("Cannot add exercises to inactive workout plan");
 
@@ -54,7 +58,8 @@ public class WorkoutPlan : Entity<WorkoutPlan, Guid> {
         _exercises.Add(planExercise);
     }
 
-    public void RemoveExercise(Guid exerciseId, int day) {
+    public void RemoveExercise(Guid exerciseId, int day)
+    {
         var exercise = _exercises.FirstOrDefault(e => e.ExerciseId == exerciseId && e.Day == day);
         if (exercise != null)
         {
@@ -65,7 +70,8 @@ public class WorkoutPlan : Entity<WorkoutPlan, Guid> {
     public void Activate() => IsActive = true;
     public void Deactivate() => IsActive = false;
 
-    public void UpdateDetails(string name, string? description = null) {
+    public void UpdateDetails(string name, string? description = null)
+    {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Description = description;
     }

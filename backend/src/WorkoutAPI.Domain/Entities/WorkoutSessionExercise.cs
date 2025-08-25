@@ -5,7 +5,8 @@ using WorkoutAPI.Domain.ValueObjects;
 
 namespace WorkoutAPI.Domain.Entities;
 
-public class WorkoutSessionExercise : Entity<WorkoutSessionExercise, Guid> {
+public class WorkoutSessionExercise : Entity<WorkoutSessionExercise, Guid>
+{
     private readonly List<ExerciseSetRecord> _sets = new();
 
     public Guid WorkoutSessionId { get; private set; }
@@ -20,8 +21,10 @@ public class WorkoutSessionExercise : Entity<WorkoutSessionExercise, Guid> {
 
     private WorkoutSessionExercise() { } // EF Core
 
-    public static WorkoutSessionExercise CreateNew(Guid workoutSessionId, Guid exerciseId, int order) {
-        return new WorkoutSessionExercise {
+    public static WorkoutSessionExercise CreateNew(Guid workoutSessionId, Guid exerciseId, int order)
+    {
+        return new WorkoutSessionExercise
+        {
             Id = Guid.NewGuid(),
             WorkoutSessionId = workoutSessionId,
             ExerciseId = exerciseId,
@@ -29,13 +32,15 @@ public class WorkoutSessionExercise : Entity<WorkoutSessionExercise, Guid> {
         };
     }
 
-    public void StartExercise() {
+    public void StartExercise()
+    {
         if (IsCompleted)
             throw new InvalidOperationException("Exercise already completed");
         StartTime = DateTime.UtcNow;
     }
 
-    public void CompleteSets(List<ExerciseSetRecord> sets) {
+    public void CompleteSets(List<ExerciseSetRecord> sets)
+    {
         if (IsCompleted)
             throw new InvalidOperationException("Exercise already completed");
 
@@ -46,7 +51,8 @@ public class WorkoutSessionExercise : Entity<WorkoutSessionExercise, Guid> {
         EndTime = DateTime.UtcNow;
     }
 
-    public void AddSet(ExerciseSetRecord set) {
+    public void AddSet(ExerciseSetRecord set)
+    {
         if (IsCompleted)
             throw new InvalidOperationException("Cannot add sets to completed exercise");
         _sets.Add(set ?? throw new ArgumentNullException(nameof(set)));
