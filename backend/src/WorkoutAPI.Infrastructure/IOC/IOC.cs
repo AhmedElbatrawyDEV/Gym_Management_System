@@ -91,6 +91,16 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
+    public static IServiceCollection AddDomainServices(this IServiceCollection services)
+    {
+        // Add MediatR for domain events
+        services.AddMediatR(cfg =>
+        {
+            cfg.RegisterServicesFromAssembly(typeof(WorkoutAPI.Domain.Events.IDomainEvent).Assembly);
+        });
+
+        return services;
+    }
 
     public static IServiceCollection AddInfrastructureOptions(this IServiceCollection services,
        IConfiguration configuration)

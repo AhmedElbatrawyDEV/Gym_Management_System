@@ -12,4 +12,3 @@ public interface IUserRepository : IRepository<User>
     Task<bool> IsEmailUniqueAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
     Task<IEnumerable<User>> SearchAsync(string searchTerm, CancellationToken cancellationToken = default);
 }
-

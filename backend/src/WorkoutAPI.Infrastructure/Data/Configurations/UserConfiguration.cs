@@ -12,8 +12,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.ToTable("Users");
 
         // Primary key
-        builder.HasKey(u => u.Guid);
-        builder.Property(u => u.Guid).ValueGeneratedNever();
+        builder.HasKey(u => u.Id);
+        builder.Property(u => u.Id).ValueGeneratedNever();
 
         // Properties
         builder.Property(u => u.ProfileImageUrl).HasMaxLength(500);

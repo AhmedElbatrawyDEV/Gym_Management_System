@@ -41,7 +41,7 @@ public class Payment : AggregateRoot<Payment>
         PaymentDate = DateTime.UtcNow;
         TransactionId = transactionId;
 
-        AddEvent(new PaymentProcessedEvent(Guid, UserId, Amount.Amount));
+        AddEvent(new PaymentProcessedEvent(Id, UserId, Amount.Amount));
     }
 
     public void FailPayment(string reason)

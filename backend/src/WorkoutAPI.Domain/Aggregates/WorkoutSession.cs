@@ -52,7 +52,7 @@ public class WorkoutSession : AggregateRoot<WorkoutSession>
         Notes = notes;
 
         var duration = EndTime.Value - StartTime;
-        AddEvent(new WorkoutSessionCompletedEvent(Guid, UserId, duration));
+        AddEvent(new WorkoutSessionCompletedEvent(Id, UserId, duration));
     }
 
     public void CancelSession(string reason)
@@ -69,7 +69,7 @@ public class WorkoutSession : AggregateRoot<WorkoutSession>
         if (Status != WorkoutSessionStatus.Scheduled)
             throw new InvalidOperationException("Can only add exercises to scheduled sessions");
 
-        var sessionExercise = WorkoutSessionExercise.CreateNew(Guid, exercise.Id, order);
+        var sessionExercise = WorkoutSessionExercise.CreateNew(Id, exercise.Id, order);
         _exercises.Add(sessionExercise);
     }
 

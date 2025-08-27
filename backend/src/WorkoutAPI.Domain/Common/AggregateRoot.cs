@@ -5,7 +5,7 @@ using WorkoutAPI.Domain.Events;
 namespace WorkoutAPI.Domain.Common;
 public interface IAggregateRoot : ISupportInitialize
 {
-    Guid Guid { get; }
+    Guid Id { get; }
 
     IEnumerable<IDomainEvent> UncommittedEvents { get; }
 
@@ -31,7 +31,7 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
         {
             TAggregate val = new TAggregate();
             val.BeginInit();
-            val.Guid = Guid.NewGuid();
+            val.Id = Guid.NewGuid();
             val.AddEvent(new AggregateCreatedEvent<TAggregate>(val), enforceWhileInitialization: true);
             val.EndInit();
             return val;
@@ -40,7 +40,7 @@ public abstract class AggregateRoot<TAggregate> : IAggregateRoot, ISupportInitia
 
     protected readonly ICollection<IDomainEvent> _UncommittedEvents;
 
-    public Guid Guid { get; protected set; }
+    public Guid Id { get; protected set; }
 
     public IEnumerable<IDomainEvent> UncommittedEvents => new ReadOnlyCollection<IDomainEvent>(_UncommittedEvents.ToList());
 

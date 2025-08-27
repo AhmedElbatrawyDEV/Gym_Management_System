@@ -36,7 +36,7 @@ public class UserRepository : BaseRepository<User>, IUserRepository {
 
         if (excludeUserId.HasValue)
         {
-            query = query.Where(u => u.Guid != excludeUserId.Value);
+            query = query.Where(u => u.Id != excludeUserId.Value);
         }
 
         return !await query.AnyAsync(cancellationToken);

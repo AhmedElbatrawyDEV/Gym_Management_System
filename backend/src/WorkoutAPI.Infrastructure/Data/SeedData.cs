@@ -260,10 +260,10 @@ public static class DatabaseSeeder
 
         var trainers = new[]
         {
-            CreateTrainer(users[0].Guid, "Strength Training & Bodybuilding", "ACSM Certified Personal Trainer", 150),
-            CreateTrainer(users[1].Guid, "Yoga & Pilates", "RYT-500 Yoga Alliance", 120),
-            CreateTrainer(users[2].Guid, "CrossFit & Functional Training", "CrossFit Level 2 Trainer", 180),
-            CreateTrainer(users[3].Guid, "Cardio & Weight Loss", "NASM Certified Personal Trainer", 130)
+            CreateTrainer(users[0].Id, "Strength Training & Bodybuilding", "ACSM Certified Personal Trainer", 150),
+            CreateTrainer(users[1].Id, "Yoga & Pilates", "RYT-500 Yoga Alliance", 120),
+            CreateTrainer(users[2].Id, "CrossFit & Functional Training", "CrossFit Level 2 Trainer", 180),
+            CreateTrainer(users[3].Id, "Cardio & Weight Loss", "NASM Certified Personal Trainer", 130)
         };
 
         await context.Trainers.AddRangeAsync(trainers);

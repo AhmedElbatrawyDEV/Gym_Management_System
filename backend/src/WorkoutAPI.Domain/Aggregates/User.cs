@@ -35,7 +35,7 @@ public class User : AggregateRoot<User>
         user.CreatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
 
-        user.AddEvent(new UserRegisteredEvent(user.Guid, contactInfo.Email));
+        user.AddEvent(new UserRegisteredEvent(user.Id, contactInfo.Email));
         return user;
     }
 
@@ -84,7 +84,7 @@ public class User : AggregateRoot<User>
         if (plan == null) throw new ArgumentNullException(nameof(plan));
 
         var endDate = startDate.AddDays(plan.DurationDays);
-        var subscription = UserSubscription.CreateNew(Guid, plan.Id, new DateRange(startDate, endDate));
+        var subscription = UserSubscription.CreateNew(Id, plan.Id, new DateRange(startDate, endDate));
         _subscriptions.Add(subscription);
         UpdatedAt = DateTime.UtcNow;
     }

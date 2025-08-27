@@ -13,8 +13,8 @@ public class WorkoutSessionConfiguration : IEntityTypeConfiguration<WorkoutSessi
         builder.ToTable("WorkoutSessions");
 
         // Primary key
-        builder.HasKey(ws => ws.Guid);
-        builder.Property(ws => ws.Guid).ValueGeneratedNever();
+        builder.HasKey(ws => ws.Id);
+        builder.Property(ws => ws.Id).ValueGeneratedNever();
 
         // Properties
         builder.Property(ws => ws.UserId).IsRequired();

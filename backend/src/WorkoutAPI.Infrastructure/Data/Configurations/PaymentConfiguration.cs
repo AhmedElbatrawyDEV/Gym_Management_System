@@ -14,8 +14,8 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.ToTable("Payments");
 
         // Primary key
-        builder.HasKey(p => p.Guid);
-        builder.Property(p => p.Guid).ValueGeneratedNever();
+        builder.HasKey(p => p.Id);
+        builder.Property(p => p.Id).ValueGeneratedNever();
 
         // Properties
         builder.Property(p => p.UserId).IsRequired();
