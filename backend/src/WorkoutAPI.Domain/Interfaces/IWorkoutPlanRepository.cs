@@ -9,4 +9,11 @@ public interface IWorkoutPlanRepository : IRepository<WorkoutPlan>
     Task<IEnumerable<WorkoutPlan>> GetByDifficultyAsync(DifficultyLevel difficulty, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkoutPlan>> GetActivePlansAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkoutPlan>> GetByCreatorAsync(Guid creatorId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<WorkoutPlan>> GetFilteredAsync(
+    Guid? createdBy,
+    WorkoutPlanType? type,
+    DifficultyLevel? difficulty,
+    bool? activeOnly,
+    CancellationToken cancellationToken = default);
+
 }

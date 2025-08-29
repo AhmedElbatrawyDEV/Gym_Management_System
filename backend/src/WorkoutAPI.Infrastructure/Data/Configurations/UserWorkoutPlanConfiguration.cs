@@ -43,4 +43,4 @@ public class UserWorkoutPlanConfiguration : IEntityTypeConfiguration<UserWorkout
             .HasForeignKey(uwp => uwp.AssignedBy)
             .OnDelete(DeleteBehavior.Restrict);
     }
-} 
+}

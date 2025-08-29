@@ -8,4 +8,5 @@ public interface IClassScheduleRepository : IRepository<ClassSchedule>
     Task<IEnumerable<ClassSchedule>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
     Task<IEnumerable<ClassSchedule>> GetUpcomingSchedulesAsync(int daysAhead = 7, CancellationToken cancellationToken = default);
     Task<IEnumerable<ClassSchedule>> GetAvailableSchedulesAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<ClassSchedule>> GetByIdsAsync(IEnumerable<Guid> scheduleIds, CancellationToken cancellationToken = default);
 }

@@ -10,5 +10,6 @@ public interface IPaymentRepository : IRepository<Payment>
     Task<IEnumerable<Payment>> GetByStatusAsync(PaymentStatus status, CancellationToken cancellationToken = default);
     Task<IEnumerable<Payment>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
     Task<decimal> GetTotalRevenueAsync(DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default);
+    Task<(IEnumerable<Payment> payments, int totalCount)> GetPaginatedByUserAsync(int pageNumber, int pageSize, Guid userId, CancellationToken cancellationToken);
 }
 

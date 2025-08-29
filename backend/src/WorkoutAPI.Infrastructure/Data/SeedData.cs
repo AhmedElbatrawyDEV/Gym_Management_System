@@ -327,7 +327,7 @@ public static class DatabaseSeederExtensions
         }
         catch (Exception ex)
         {
-             throw;
+            throw;
         }
 
         return serviceProvider;

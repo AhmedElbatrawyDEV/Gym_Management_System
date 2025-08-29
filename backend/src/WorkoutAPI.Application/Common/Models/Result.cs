@@ -1,11 +1,4 @@
-﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WorkoutAPI.Application.Common.Models;
+﻿namespace WorkoutAPI.Application.Common.Models;
 public class Result<T>
 {
     public bool IsSuccess { get; private set; }

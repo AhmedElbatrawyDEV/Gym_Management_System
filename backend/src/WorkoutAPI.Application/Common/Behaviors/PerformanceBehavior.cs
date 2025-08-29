@@ -34,5 +34,3 @@ public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     }
 }
 
-// ===== Common/Exceptions/ValidationException.cs =====
-using FluentValidation.Results;

@@ -15,7 +15,7 @@ public class UserRegisteredEvent : DomainEvent
 
 public class WorkoutSessionCompletedEvent : DomainEvent
 {
- 
+
     public Guid SessionId { get; }
     public Guid UserId { get; }
     public TimeSpan Duration { get; }

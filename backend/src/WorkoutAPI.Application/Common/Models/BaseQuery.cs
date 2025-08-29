@@ -5,8 +5,9 @@ namespace WorkoutAPI.Application.Common.Models;
 public abstract class BaseQuery<TResponse> : IRequest<Result<TResponse>>
 {
 }
-public abstract class BasePagedQuery<TResponse> : BaseQuery<PaginatedResult<TResponse>>
+
+public abstract class BasePaginatedQuery<TResponse> : IRequest<PaginatedResult<TResponse>>
 {
-    public int Page { get; set; } = 1;
-    public int PageSize { get; set; } = 10;
+    public int PageNumber { get; init; } = 1;
+    public int PageSize { get; init; } = 10;
 }

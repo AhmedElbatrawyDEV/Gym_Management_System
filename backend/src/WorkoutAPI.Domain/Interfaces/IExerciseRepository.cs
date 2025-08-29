@@ -11,5 +11,7 @@ public interface IExerciseRepository : IRepository<Exercise>
     Task<Exercise?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
     Task<IEnumerable<Exercise>> GetActiveExercisesAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Exercise>> SearchAsync(string searchTerm, Language language, CancellationToken cancellationToken = default);
+    Task<(IEnumerable<Exercise> exercises, int totalCount)> GetPaginatedAsync(int pageNumber, int pageSize, ExerciseType? type, MuscleGroup? muscleGroup, DifficultyLevel? difficulty, bool? activeOnly, CancellationToken cancellationToken);
+    Task<IEnumerable<Exercise>> GetByIdsAsync(List<Guid> exerciseIds, CancellationToken cancellationToken);
 }
 

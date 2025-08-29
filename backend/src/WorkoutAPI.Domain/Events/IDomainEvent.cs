@@ -9,7 +9,7 @@ public interface IMessage : INotification
 
     DateTimeOffset TimeStamp => DateTimeOffset.UtcNow;
 }
-public interface IEvent : IMessage , INotification
+public interface IEvent : IMessage, INotification
 {
 }
 
@@ -17,13 +17,13 @@ public interface IDomainEvent : IEvent, IMessage, INotification
 {
 }
 
-public abstract class DomainEvent : IDomainEvent , IEvent, IMessage, INotification
+public abstract class DomainEvent : IDomainEvent, IEvent, IMessage, INotification
 {
     public DateTime OccurredOn { get; } = DateTime.UtcNow;
     public Guid EventId { get; } = Guid.NewGuid();
 }
 
-public abstract record AggregateDomainEvent<T> : IDomainEvent , IEvent, IMessage, INotification where T : IAggregateRoot
+public abstract record AggregateDomainEvent<T> : IDomainEvent, IEvent, IMessage, INotification where T : IAggregateRoot
 {
     public T Aggregate { get; }
 

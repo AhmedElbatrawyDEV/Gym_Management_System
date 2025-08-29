@@ -8,4 +8,11 @@ public interface IClassBookingRepository : IRepository<ClassBooking>
     Task<IEnumerable<ClassBooking>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<ClassBooking>> GetByClassScheduleIdAsync(Guid classScheduleId, CancellationToken cancellationToken = default);
     Task<IEnumerable<ClassBooking>> GetByStatusAsync(BookingStatus status, CancellationToken cancellationToken = default);
+    Task<IEnumerable<ClassBooking>> GetFilteredAsync(
+        Guid? userId = null,
+        Guid? classScheduleId = null,
+        BookingStatus? status = null,
+        DateTime? fromDate = null,
+        DateTime? toDate = null,
+        CancellationToken cancellationToken = default);
 }

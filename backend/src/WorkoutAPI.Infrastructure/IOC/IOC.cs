@@ -1,19 +1,13 @@
 ﻿
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using WorkoutAPI.Domain.Common;
-using WorkoutAPI.Infrastructure.Repositories;
-using System.Data.Common;
-using MediatR;
 using System.Reflection;
-using WorkoutAPI.Infrastructure.Data;
-using WorkoutAPI.Domain.Interfaces;
-using Microsoft.Extensions.Hosting;
 using WorkoutAPI.Domain.Events;
-using System.Data.Common;
-using WorkoutAPI.Infrastructure.EventHandlers;
+using WorkoutAPI.Domain.Interfaces;
+using WorkoutAPI.Infrastructure.Data;
+using WorkoutAPI.Infrastructure.Repositories;
 
 namespace WorkoutAPI.Infrastructure.IOC;
 
@@ -59,16 +53,11 @@ public static class ServiceCollectionExtensions
             return unitOfWork;
         });
 
-        // Add Repositories
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IWorkoutSessionRepository, WorkoutSessionRepository>();
-        services.AddScoped<IPaymentRepository, PaymentRepository>();
-        services.AddScoped<IExerciseRepository, ExerciseRepository>();
-        services.AddScoped<ITrainerRepository, TrainerRepository>();
-        services.AddScoped<ISubscriptionPlanRepository, SubscriptionPlanRepository>();
-
-        // Add generic repository for entities not having specific repositories
-        services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
+        services.Scan(scan => scan
+            .FromAssemblyOf<IUserRepository>() // or any known type in the same assembly
+            .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
+                .AsImplementedInterfaces()
+                .WithScopedLifetime());
 
         // Add MediatR for domain events
         services.AddMediatR(cfg =>
@@ -76,13 +65,13 @@ public static class ServiceCollectionExtensions
             // Register from Domain assembly for events
             cfg.RegisterServicesFromAssembly(typeof(IDomainEvent).Assembly);
             // Register from Infrastructure assembly for handlers
-            cfg.RegisterServicesFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
+            cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
 
-        // Add Domain Event Handlers
-        services.AddScoped<INotificationHandler<UserRegisteredEvent>, UserRegisteredEventHandler>();
-        services.AddScoped<INotificationHandler<WorkoutSessionCompletedEvent>, WorkoutSessionCompletedEventHandler>();
-        services.AddScoped<INotificationHandler<PaymentProcessedEvent>, PaymentProcessedEventHandler>();
+
+
+        // Generic repository
+        services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
 
         // Add Health Checks
         services.AddHealthChecks()
@@ -111,17 +100,4 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-}
-
-public class DatabaseOptions
-{
-    public const string SectionName = "Database";
-
-    public string ConnectionString { get; set; } = string.Empty;
-    public int CommandTimeout { get; set; } = 30;
-    public int MaxRetryCount { get; set; } = 3;
-    public int MaxRetryDelay { get; set; } = 30;
-    public bool EnableSensitiveDataLogging { get; set; } = false;
-    public bool EnableDetailedErrors { get; set; } = false;
-    public bool EnableQuerySplitting { get; set; } = true;
 }
